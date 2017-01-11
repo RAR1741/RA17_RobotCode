@@ -23,7 +23,19 @@ public class Robot extends IterativeRobot
 	}
 
 	@Override
+	public void teleopInit()
+	{
+		
+	}
+
+	@Override
 	public void teleopPeriodic()
+	{
+		
+	}
+
+	@Override
+	public void testInit()
 	{
 		
 	}
