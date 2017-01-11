@@ -1,7 +1,12 @@
 package org.redalert1741.steamworks;
 
+import org.redalert1741.robotBase.config.Config;
+import org.redalert1741.robotBase.logging.DataLogger;
+import org.redalert1741.robotBase.logging.Loggable;
+
+import com.ctre.CANTalon;
+
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.PIDController;
 
 public class SwerveModule implements Loggable
@@ -19,13 +24,13 @@ public class SwerveModule implements Loggable
 	
 	public SwerveModule(CANTalon d, CANTalon a, AnalogInput e, String name)
 	{
-		SteerP = Config.GetSetting("steerP",2);
-		SteerI = Config.GetSetting("steerI",0);
-		SteerD = Config.GetSetting("steerD",0);
-		SteerTolerance = Config.GetSetting("Steering%Tolerance", .25);
-		SteerSpeed = Config.GetSetting("SteerSpeed", 1);
-		SteerEncMax = Config.GetSetting("SteerEncMax",4.792);
-		SteerOffset = Config.GetSetting("SteerEncOffset",0);
+		SteerP = Config.getSetting("steerP",2);
+		SteerI = Config.getSetting("steerI",0);
+		SteerD = Config.getSetting("steerD",0);
+		SteerTolerance = Config.getSetting("Steering%Tolerance", .25);
+		SteerSpeed = Config.getSetting("SteerSpeed", 1);
+		SteerEncMax = Config.getSetting("SteerEncMax",4.792);
+		SteerOffset = Config.getSetting("SteerEncOffset",0);
 		
 		drive = d;
 		drive.setControlMode(0);
@@ -91,48 +96,48 @@ public class SwerveModule implements Loggable
 	}
 	
 	@Override
-	public void setupLogging(Logger logger)
+	public void setupLogging(DataLogger logger)
 	{
-		logger.AddAttribute(s + "pos");
-		logger.AddAttribute(s + "Current");
-		logger.AddAttribute(s + "speed");
-		logger.AddAttribute(s + "Apos");
-		logger.AddAttribute(s + "ACurrent");
-		logger.AddAttribute(s + "Encpos");
-		logger.AddAttribute(s + "EncSetpoint");
-		logger.AddAttribute(s + "EncSpeed");
+		logger.addAttribute(s + "pos");
+		logger.addAttribute(s + "Current");
+		logger.addAttribute(s + "speed");
+		logger.addAttribute(s + "Apos");
+		logger.addAttribute(s + "ACurrent");
+		logger.addAttribute(s + "Encpos");
+		logger.addAttribute(s + "EncSetpoint");
+		logger.addAttribute(s + "EncSpeed");
 	}
 	
 	@Override
-	public void log(Logger logger)
+	public void log(DataLogger logger)
 	{
-		logger.Log(s + "pos", drive.getEncPosition());
-		logger.Log(s + "Current", drive.getOutputCurrent());
-		logger.Log(s + "speed", drive.getSpeed());
-		logger.Log(s + "Apos", angle.getEncPosition());
-		logger.Log(s + "ACurrent", angle.getOutputCurrent());
+		logger.log(s + "pos", drive.getEncPosition());
+		logger.log(s + "Current", drive.getOutputCurrent());
+		logger.log(s + "speed", drive.getSpeed());
+		logger.log(s + "Apos", angle.getEncPosition());
+		logger.log(s + "ACurrent", angle.getOutputCurrent());
 		//logger.Log(s + "Encpos", encoder.getVoltage() + encFake.m_offset);
-		logger.Log(s + "Encpos", encoder.getVoltage());
-		logger.Log(s + "EncSetpoint", PIDc.getSetpoint());
-		logger.Log(s + "EncSpeed", encFake.getSpeed());
+		logger.log(s + "Encpos", encoder.getVoltage());
+		logger.log(s + "EncSetpoint", PIDc.getSetpoint());
+		logger.log(s + "EncSpeed", encFake.getSpeed());
 	}
 	
 	public void ReloadConfig(String s)
 	{
 	/////////////////////////////////////////////////////
-		SteerP = Config.GetSetting("steerP",2);
-		SteerI = Config.GetSetting("steerI",0);
-		SteerD = Config.GetSetting("steerD",0);
+		SteerP = Config.getSetting("steerP",2);
+		SteerI = Config.getSetting("steerI",0);
+		SteerD = Config.getSetting("steerD",0);
 		PIDc.setPID(SteerP,SteerI,SteerD);
 	///////////////////////////////////////////////////////////////////
-		SteerTolerance = Config.GetSetting("Steering%Tolerance", 0.25);
-		SteerSpeed = Config.GetSetting("SteerSpeed", 1);
-		SteerEncMax = Config.GetSetting("SteerEncMax" + s,4.792);
+		SteerTolerance = Config.getSetting("Steering%Tolerance", 0.25);
+		SteerSpeed = Config.getSetting("SteerSpeed", 1);
+		SteerEncMax = Config.getSetting("SteerEncMax" + s,4.792);
 		PIDc.setInputRange(0,SteerEncMax);
 		PIDc.setOutputRange(-SteerSpeed,SteerSpeed);
 		PIDc.setPercentTolerance(SteerTolerance);
 	/////////////////////////////////////////////////////
-		SteerOffset = Config.GetSetting("SteerEncOffset" + s,0);
+		SteerOffset = Config.getSetting("SteerEncOffset" + s,0);
 		encFake.setOffset(SteerOffset);
 	}
 }

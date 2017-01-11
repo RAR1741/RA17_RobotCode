@@ -20,7 +20,7 @@ public class DataLogger
 		loggables = new ArrayList<>();
 	}
 
-	boolean open(String filename)
+	public boolean open(String filename)
 	{
 		this.filename = filename;
 		try
@@ -34,7 +34,7 @@ public class DataLogger
 		return true;
 	}
 
-	void close()
+	public void close()
 	{
 		if(log!=null)
 		{
@@ -42,7 +42,7 @@ public class DataLogger
 		}
 	}
 
-	boolean reset()
+	public boolean reset()
 	{
 		close();
 		open(this.filename);
@@ -50,7 +50,7 @@ public class DataLogger
 		return true;
 	}
 
-	boolean hasAttribute(String name)
+	public boolean hasAttribute(String name)
 	{
 		return fields.containsKey(name);
 	}
@@ -70,7 +70,7 @@ public class DataLogger
 //		return null;
 //	}
 
-	boolean addAttribute(String field)
+	public boolean addAttribute(String field)
 	{
 		if (hasAttribute(field)) {
 			// TODO: Output warning
@@ -82,12 +82,12 @@ public class DataLogger
 		return true;
 	}
 
-	boolean log(String field, double d)
+	public boolean log(String field, double d)
 	{
 		return log(field, String.valueOf(d));
 	}
 
-	boolean log(String field, String data)
+	public boolean log(String field, String data)
 	{
 		if(!hasAttribute(field)) return false;
 		
@@ -95,7 +95,7 @@ public class DataLogger
 		return true;
 	}
 	
-	boolean log(String field, Object data)
+	public boolean log(String field, Object data)
 	{
 		if(!hasAttribute(field)) return false;
 		
@@ -103,7 +103,7 @@ public class DataLogger
 		return true;
 	}
 
-	boolean writeAttributes()
+	public boolean writeAttributes()
 	{
 		for (Map.Entry<String,String> e : fields.entrySet())
 		{
@@ -113,7 +113,7 @@ public class DataLogger
 		return !log.checkError();
 	}
 
-	boolean WriteLine()
+	public boolean writeLine()
 	{
 		for (Map.Entry<String,String> e : fields.entrySet())
 		{

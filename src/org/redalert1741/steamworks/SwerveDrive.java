@@ -1,7 +1,11 @@
 package org.redalert1741.steamworks;
 
+import org.redalert1741.robotBase.config.Config;
+import org.redalert1741.robotBase.logging.DataLogger;
+import org.redalert1741.robotBase.logging.Loggable;
+
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.CANTalon;
+import com.ctre.CANTalon;
 
 public class SwerveDrive implements Loggable
 {
@@ -28,8 +32,8 @@ public class SwerveDrive implements Loggable
 		BRM = new SwerveModule(br, bra, bre, "BR");
 		BLM = new SwerveModule(bl, bla, ble, "BL");
 
-		length = Config.GetSetting("FrameLength",1);
-		width = Config.GetSetting("FrameWidth",1);
+		length = Config.getSetting("FrameLength",1);
+		width = Config.getSetting("FrameWidth",1);
 		diameter = Math.sqrt(Math.pow(length,2)+Math.pow(width,2));
 		temp = 0.0;
 		a = 0.0;b = 0.0;c = 0.0;d = 0.0;
@@ -121,7 +125,7 @@ public class SwerveDrive implements Loggable
 	}
 	
 	@Override
-	public void setupLogging(Logger logger)
+	public void setupLogging(DataLogger logger)
 	{
 		FRM.setupLogging(logger);
 		FLM.setupLogging(logger);
@@ -130,7 +134,7 @@ public class SwerveDrive implements Loggable
 	}
 	
 	@Override
-	public void log(Logger logger)
+	public void log(DataLogger logger)
 	{
 		FRM.log(logger);
 		FLM.log(logger);
@@ -140,9 +144,9 @@ public class SwerveDrive implements Loggable
 
 	void ReloadConfig()
 	{
-		length = Config.GetSetting("FrameLength",1);
-		width = Config.GetSetting("FrameWidth",1);
-		TurningSpeedFactor = Config.GetSetting("turningSpeedFactor", 1);
+		length = Config.getSetting("FrameLength",1);
+		width = Config.getSetting("FrameWidth",1);
+		TurningSpeedFactor = Config.getSetting("turningSpeedFactor", 1);
 	/////////////////////////////////////////////////////
 		FRM.ReloadConfig("FR");
 		FLM.ReloadConfig("FL");
