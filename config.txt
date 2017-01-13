@@ -1,0 +1,34 @@
+#Config File
+#################################
+AutoAimP = 0.12
+AutoAimI = 0.0
+AutoAimD = 0.0
+
+#Swerve Variables:
+speedP = 1
+speedI = 0
+speedD = 0
+
+steerP = 1.2
+steerI = 0
+steerD = 0
+
+Steering%Tolerance = 0.25
+SteerSpeed = .5
+turningSpeedFactor = 1
+driveCIMmaxRPM = 4000
+
+#SteerEncMax = 4.79
+SteerEncMaxBL = 4.892
+SteerEncMaxBR = 4.901
+SteerEncMaxFL = 4.92
+SteerEncMaxFR = 4.914
+
+SteerEncOffsetFR = 3.10
+SteerEncOffsetFL = 3.85
+SteerEncOffsetBR = 2.2
+SteerEncOffsetBL = 3.56
+
+FrameLength = 23.625
+FrameWidth = 14.125
+#################################
