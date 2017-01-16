@@ -7,17 +7,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
+
 public class DataLogger 
 {
 	private String filename;
 	private PrintWriter log = null;
 	private Map<String, String> fields;
 	private List<Loggable> loggables;
+	private NetworkTable table;
 
 	public DataLogger()
 	{
 		fields = new LinkedHashMap<String,String>();
 		loggables = new ArrayList<>();
+		table = NetworkTable.getTable("logging");
 	}
 
 	public boolean open(String filename)
@@ -84,6 +88,7 @@ public class DataLogger
 
 	public boolean log(String field, double d)
 	{
+		table.putNumber(field, d);
 		return log(field, String.valueOf(d));
 	}
 
