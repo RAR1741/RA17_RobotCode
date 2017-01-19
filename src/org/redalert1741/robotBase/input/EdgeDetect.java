@@ -4,12 +4,12 @@ public class EdgeDetect
 {
 	private boolean state;
 	
-	EdgeDetect()
+	public EdgeDetect()
 	{
 		state = false;
 	}
 	
-	boolean Check(boolean in)
+	public boolean Check(boolean in)
 	{
 		boolean out;
 		if(in && state)
