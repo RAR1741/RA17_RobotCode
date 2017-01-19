@@ -1,5 +1,8 @@
 package org.redalert1741.steamworks;
 
+import com.ctre.CANTalon;
+import com.ctre.CANTalon.TalonControlMode;
+
 public class Collection 
 {
 	CANTalon input;
