@@ -27,6 +27,7 @@ public class Robot extends IterativeRobot
 	private static DataLogger logger;
 	private static Timer timer;
 	private String auto = "";
+	private double[] maxEncValue = new double[4];
 	
 	SwerveDrive drive;
 	XboxController driver;
@@ -163,6 +164,15 @@ public class Robot extends IterativeRobot
     	if(driver.getBackButton())
     	{
     		ReloadConfig();
+    	}
+    	
+    	if(driver.getStartButton())
+    	{
+    		maxEncValue = drive.calibrateAngle();
+    		for(double x: maxEncValue)
+    		{
+    			System.out.println(x);
+    		}
     	}
 	}
 	

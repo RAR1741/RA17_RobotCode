@@ -8,6 +8,7 @@ import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.Timer;
 
 public class SwerveModule implements Loggable
 {
@@ -93,6 +94,24 @@ public class SwerveModule implements Loggable
 	public void setAngle(double angle)
 	{
 		PIDc.setSetpoint(angle*(SteerEncMax/360.0f));
+	}
+	
+	public double calibrateAngle() 
+	{
+		double max = 0;
+		Timer t = new Timer();
+		t.reset();
+		t.start();
+		angle.set(0.1);
+		while(t.get() <= 5)
+		{
+			if(encoder.getVoltage() > max)
+			{
+				max = encoder.getVoltage();
+			}
+		}
+		angle.set(0);
+		return max;
 	}
 	
 	@Override

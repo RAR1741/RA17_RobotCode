@@ -175,6 +175,16 @@ public class SwerveDrive implements Loggable
 		}
 	}
 	
+	public double[] calibrateAngle()
+	{
+		double[] max = new double[4];
+		max[0] = FRM.calibrateAngle();
+		max[1] = FLM.calibrateAngle();
+		max[2] = BRM.calibrateAngle();
+		max[3] = BLM.calibrateAngle();
+		return max;
+	}
+	
 	@Override
 	public void setupLogging(DataLogger logger)
 	{
