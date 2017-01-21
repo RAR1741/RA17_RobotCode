@@ -4,8 +4,10 @@ import org.redalert1741.robotBase.logging.DataLogger;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -17,6 +19,7 @@ public class Robot extends IterativeRobot
 	private String auto = "";
 	
 	Vision targeting;
+	Relay light;
 	
 	@Override
 	public void robotInit()
@@ -31,8 +34,12 @@ public class Robot extends IterativeRobot
 		{
             DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
         }
-		
+		try{
 		targeting = new Vision();
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+		}
+		light = new Relay(0);
 	}
 
 	@Override
@@ -50,13 +57,20 @@ public class Robot extends IterativeRobot
 	@Override
 	public void teleopInit()
 	{
-		targeting.startCameraStream();
+		//targeting.startCameraStream();
+		light.set(Value.kForward);
+	}
+	
+	@Override
+	public void disabledInit()
+	{
+		light.set(Value.kOff);
 	}
 
 	@Override
 	public void teleopPeriodic()
 	{
-		
+		light.set(Value.kForward);
 	}
 
 	@Override

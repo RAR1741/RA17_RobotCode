@@ -15,6 +15,7 @@ import org.redalert1741.robotBase.config.Configurable;
 import org.redalert1741.robotBase.logging.DataLogger;
 import org.redalert1741.robotBase.logging.Loggable;
 
+import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class Vision implements Configurable, Loggable, Runnable
@@ -26,11 +27,10 @@ public class Vision implements Configurable, Loggable, Runnable
 	private final double minAspectR = 0.75;
 	
 	static
-	{ 
+	{
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		NetworkTable.setClientMode();
-		NetworkTable.setIPAddress("roborio-1741-frc.local");
 	}
+	
 //	Constants for RGB values
 	public static final Scalar 
 		RED = new Scalar(0, 0, 255),
@@ -72,7 +72,7 @@ public class Vision implements Configurable, Loggable, Runnable
 		
 //		Set the network table to use
 		table = NetworkTable.getTable("logging");
-		station = NetworkTable.getTable("Station");
+//		station = NetworkTable.getTable("Station");
 	}
 	
 	public void startCameraStream()
@@ -86,7 +86,6 @@ public class Vision implements Configurable, Loggable, Runnable
 				
 				System.out.println("Opening stream...");
 				videoCapture.open(cameraURL);
-				
 				System.out.println("Checking connection...");
 //				Wait until it is opened
 				while(!videoCapture.isOpened()){}
