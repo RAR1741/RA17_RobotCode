@@ -1,13 +1,21 @@
 package org.redalert1741.steamworks;
 
+import java.util.List;
+
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Rect;
+import org.opencv.imgproc.Imgproc;
 import org.redalert1741.robotBase.logging.DataLogger;
 
+import edu.wpi.cscore.AxisCamera;
+import edu.wpi.cscore.CvSink;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Relay.Value;
 
 public class Robot extends IterativeRobot
 {
@@ -15,6 +23,11 @@ public class Robot extends IterativeRobot
 	private static DataLogger logger;
 	private static Timer timer;
 	private String auto = "";
+	AxisCamera ac;
+	CvSink cvs;
+	GripPipeline grip;
+	Relay light;
+	List<MatOfPoint> tmpList;
 	
 	@Override
 	public void robotInit()
@@ -29,6 +42,32 @@ public class Robot extends IterativeRobot
 		{
             DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
         }
+		ac = new AxisCamera("camera1", "axis-1741.local");
+		cvs = new CvSink("bob");
+		cvs.setSource(ac);
+		grip = new GripPipeline();
+		new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				try
+				{
+					while(true)
+					{
+						Mat matthew = new Mat();
+						cvs.grabFrame(matthew);
+						grip.process(matthew);
+						Thread.yield();
+					}
+				}
+				catch(Exception e)
+				{
+					System.exit(0);
+				}
+			}
+		}).start();
+		light = new Relay(0);
 	}
 
 	@Override
@@ -69,6 +108,14 @@ public class Robot extends IterativeRobot
 	@Override
 	public void testPeriodic()
 	{
+		light.set(Value.kForward);
+		List<MatOfPoint> tmpList = grip.findContoursOutput();
+		for(MatOfPoint mop : tmpList)
+		{
+			System.out.println(mop);
+			//Rect rec = Imgproc.boundingRect(mop);
+			//System.out.println(rec);
+		}
 		logger.log();
 		logger.writeLine();
 	}
