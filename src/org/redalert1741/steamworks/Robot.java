@@ -142,6 +142,7 @@ public class Robot extends IterativeRobot
     	}
     	
     	drive.Swerve(x,y,twist,0,fieldOrient);
+    	ReloadConfig();
 	}
 
 	@Override
@@ -160,7 +161,7 @@ public class Robot extends IterativeRobot
 	{
 		logger.log();
 		logger.writeLine();
-    	drive.Swerve(0,0.1,0,0,fieldOrient);
+    	drive.Swerve(0,0.3,0,0,fieldOrient);
     	if(driver.getBackButton())
     	{
     		ReloadConfig();

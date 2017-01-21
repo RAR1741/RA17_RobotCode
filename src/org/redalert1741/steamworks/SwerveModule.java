@@ -5,6 +5,7 @@ import org.redalert1741.robotBase.logging.DataLogger;
 import org.redalert1741.robotBase.logging.Loggable;
 
 import com.ctre.CANTalon;
+import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PIDController;
@@ -99,18 +100,23 @@ public class SwerveModule implements Loggable
 	public double calibrateAngle() 
 	{
 		double max = 0;
+		double tmp = 0;
 		Timer t = new Timer();
 		t.reset();
 		t.start();
-		angle.set(0.1);
+		angle.changeControlMode(TalonControlMode.PercentVbus);
+		
 		while(t.get() <= 5)
 		{
+			angle.set(tmp);
+			tmp+=0.01;
 			if(encoder.getVoltage() > max)
 			{
 				max = encoder.getVoltage();
 			}
 		}
 		angle.set(0);
+		angle.setControlMode(0);
 		return max;
 	}
 	
