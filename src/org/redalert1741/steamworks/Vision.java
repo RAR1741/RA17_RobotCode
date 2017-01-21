@@ -17,7 +17,7 @@ import org.redalert1741.robotBase.logging.Loggable;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
-public class Vision implements Configurable, Loggable
+public class Vision implements Configurable, Loggable, Runnable
 {
 	private final String cameraURL = "http://axis-1741.local/mjpg/video.mjpg";
 	private final int minTargetHeight = 20;
@@ -94,7 +94,7 @@ public class Vision implements Configurable, Loggable
 				System.out.println("Opened successfully...");
 				
 //				Actually process the image
-				processImage();
+				new Thread(this).start();
 				System.out.println("Finished processing...");
 				
 			} catch (Exception e) {
@@ -107,7 +107,8 @@ public class Vision implements Configurable, Loggable
 		
 	}
 
-	public void processImage() 
+	@Override
+	public void run() 
 	{
 		ArrayList<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 		double x,y,targetAngle,distance,width,pan,tilt;

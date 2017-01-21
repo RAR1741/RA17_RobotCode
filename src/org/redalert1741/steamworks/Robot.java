@@ -16,6 +16,8 @@ public class Robot extends IterativeRobot
 	private static Timer timer;
 	private String auto = "";
 	
+	Vision targeting;
+	
 	@Override
 	public void robotInit()
 	{
@@ -29,6 +31,8 @@ public class Robot extends IterativeRobot
 		{
             DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
         }
+		
+		targeting = new Vision();
 	}
 
 	@Override
@@ -46,7 +50,7 @@ public class Robot extends IterativeRobot
 	@Override
 	public void teleopInit()
 	{
-		
+		targeting.startCameraStream();
 	}
 
 	@Override
