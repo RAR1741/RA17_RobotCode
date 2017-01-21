@@ -24,10 +24,10 @@ SteerEncMaxBR = 4.901
 SteerEncMaxFL = 4.92
 SteerEncMaxFR = 4.914
 
-SteerEncOffsetFR = 3.10
-SteerEncOffsetFL = 3.85
-SteerEncOffsetBR = 2.2
-SteerEncOffsetBL = 3.56
+SteerEncOffsetFR = 1.07
+SteerEncOffsetFL = 2.49
+SteerEncOffsetBR = 4.46
+SteerEncOffsetBL = 0.95
 
 FrameLength = 23.625
 FrameWidth = 14.125
