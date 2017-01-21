@@ -1,5 +1,6 @@
 package org.redalert1741.steamworks;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.opencv.core.Mat;
@@ -58,6 +59,7 @@ public class Robot extends IterativeRobot
 						Mat matthew = new Mat();
 						cvs.grabFrame(matthew);
 						grip.process(matthew);
+						matthew.release();
 						Thread.yield();
 					}
 				}
@@ -109,13 +111,13 @@ public class Robot extends IterativeRobot
 	public void testPeriodic()
 	{
 		light.set(Value.kForward);
-		List<MatOfPoint> tmpList = grip.findContoursOutput();
+		List<MatOfPoint> tmpList = new ArrayList<MatOfPoint>(grip.findContoursOutput());
 		for(MatOfPoint mop : tmpList)
 		{
-			System.out.println(mop);
-			//Rect rec = Imgproc.boundingRect(mop);
-			//System.out.println(rec);
+			Rect rec = Imgproc.boundingRect(mop);
+			System.out.println(rec);
 		}
+		System.out.println("break");
 		logger.log();
 		logger.writeLine();
 	}
