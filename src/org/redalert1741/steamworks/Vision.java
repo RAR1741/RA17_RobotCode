@@ -15,6 +15,8 @@ import org.redalert1741.robotBase.config.Configurable;
 import org.redalert1741.robotBase.logging.DataLogger;
 import org.redalert1741.robotBase.logging.Loggable;
 
+import edu.wpi.cscore.AxisCamera;
+import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
@@ -25,6 +27,8 @@ public class Vision implements Configurable, Loggable, Runnable
 	private final int minTargetWidth = 30;
 	private final double maxAspectR = 3;
 	private final double minAspectR = 0.75;
+	private AxisCamera ac;
+	private CvSink cvs;
 	
 	static
 	{
@@ -82,13 +86,17 @@ public class Vision implements Configurable, Loggable, Runnable
 			try {
 //				Opens up the camera stream and tries to load it
 				System.out.println("Initializing camera...");
-				videoCapture = new VideoCapture();
+				ac = new AxisCamera("camera1", "axis-1741.local");
+				cvs = new CvSink("bob");
+				cvs.setSource(ac);
+//				videoCapture = new VideoCapture();
 				
 				System.out.println("Opening stream...");
-				videoCapture.open(cameraURL);
+//				videoCapture.open(cameraURL);
 				System.out.println("Checking connection...");
 //				Wait until it is opened
-				while(!videoCapture.isOpened()){}
+//				while(!videoCapture.isOpened()){}
+				//while(!ac.isConnected()){}
 				
 				System.out.println("Opened successfully...");
 				
@@ -125,7 +133,8 @@ public class Vision implements Configurable, Loggable, Runnable
 			output = "";
 			
 //			Capture image from the axis camera
-			videoCapture.read(matOriginal);
+			cvs.grabFrame(matOriginal);
+//			videoCapture.read(matOriginal);
 			matInput = matOriginal.clone();
 			
 //			Convert the image type from BGR to HSV
