@@ -57,7 +57,7 @@ public class Robot extends IterativeRobot
 	@Override
 	public void teleopInit()
 	{
-		//targeting.startCameraStream();
+		targeting.startCameraStream();
 		light.set(Value.kForward);
 	}
 	

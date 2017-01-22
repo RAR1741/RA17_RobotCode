@@ -81,8 +81,8 @@ public class Vision implements Configurable, Loggable, Runnable
 	
 	public void startCameraStream()
 	{
-		while(true)
-		{
+//		while(true)
+//		{
 			try {
 //				Opens up the camera stream and tries to load it
 				System.out.println("Initializing camera...");
@@ -108,9 +108,9 @@ public class Vision implements Configurable, Loggable, Runnable
 //				Catch any errors and print them to the console
 				System.out.println("Uh oh...");
 				e.printStackTrace();
-				break;
+//				break;
 			}
-		}
+//		}
 		
 	}
 
@@ -131,6 +131,7 @@ public class Vision implements Configurable, Loggable, Runnable
 //			Clear variables from previous loop
 			contours.clear();
 			output = "";
+			
 			
 //			Capture image from the axis camera
 			cvs.grabFrame(matOriginal);
@@ -189,7 +190,10 @@ public class Vision implements Configurable, Loggable, Runnable
 				width = getWidth(bestRec);
 				table.putNumber("TargetWidth", width);
 //				output = String.format("%.2f,%.2f,%.2f,%.2f", width, pan, tilt, distance);
-//				System.out.println(output);
+				System.out.println("Pan: " + pan);
+				System.out.println("Tilt: " + tilt);
+				System.out.println("Distance: " + distance);
+				System.out.println("Width" + width);
 			}
 			else
 			{
@@ -198,6 +202,8 @@ public class Vision implements Configurable, Loggable, Runnable
 				table.putNumber("TargetDistance", -1);
 				table.putNumber("TargetWidth", -1);
 			}
+			matInput.release();
+			matOriginal.release();
 		}
 	}
 	
