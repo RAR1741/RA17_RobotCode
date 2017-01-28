@@ -7,18 +7,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class Config 
 {
-	private static Map<String, Double> settings;
+	private static Map<String, Double> doubleSettings;
+	private static Map<String, Boolean> booleanSettings;
+	private static Map<String, String> stringSettings;
 	private static List<Configurable> configurables; 
 
 	public static void dumpConfig()
 	{
 		System.out.println("DUMP");
-		for(Map.Entry<String, Double> e : settings.entrySet())
+		for(Map.Entry<String, Double> e : doubleSettings.entrySet())
 		{
 			System.out.println(e.getKey() + ": " + e.getValue());
 		}
@@ -35,9 +38,35 @@ public class Config
 		double retval = reasonable_default;
 		name = name.toLowerCase();
 		
-		if (settings.containsKey(name)) 
+		if (doubleSettings.containsKey(name)) 
 		{
-			retval = settings.get(name);
+			retval = doubleSettings.get(name);
+		}
+
+		return retval;
+	}
+	
+	public static boolean getSetting(String name, boolean r_default)
+	{
+		boolean retval = r_default;
+		name = name.toLowerCase();
+		
+		if (booleanSettings.containsKey(name)) 
+		{
+			retval = booleanSettings.get(name);
+		}
+
+		return retval;
+	}
+	
+	public static String getSetting(String name, String r_default)
+	{
+		String retval = r_default;
+		name = name.toLowerCase();
+		
+		if (stringSettings.containsKey(name)) 
+		{
+			retval = stringSettings.get(name);
 		}
 
 		return retval;
@@ -46,12 +75,14 @@ public class Config
 	public static void setSetting(String name, double value)
 	{
 		name = name.toLowerCase();
-		settings.put(name, value);
+		doubleSettings.put(name, value);
 	}
 
 	static boolean parse(String filename)
 	{
-		settings = new HashMap<String,Double>();
+		doubleSettings = new HashMap<String,Double>();
+		booleanSettings = new HashMap<>();
+		stringSettings = new HashMap<>();
 		Scanner infile;
 		try
 		{
@@ -69,19 +100,35 @@ public class Config
 		 * Optional ' ' around an '='
 		 * Match a number, with an optional '.' and more numbers
 		 */
-		Pattern p = Pattern.compile("(#{0})[\\w\\d_]+ ?= ?-?\\d+(\\.\\d+)?");
-		
+		Pattern doublepattern = Pattern.compile("^#{0}([\\w\\d_]+)\\s*?=\\s*?(-?\\d*(?:\\.\\d+)?)$");
+		Pattern booleanpattern = Pattern.compile("^#{0}([\\w\\d_]+)\\s*?= ?([Tt]rue|[Ff]alse)$");
+		Pattern stringpattern = Pattern.compile("^#{0}([\\w\\d_]+)\\s*?=\\s*?\"([^\"]*)\"$");
+		Matcher t;
 		while(infile.hasNextLine())
 		{
 			String in = infile.nextLine();
-			if(p.matcher(in).matches())
+			if((t = doublepattern.matcher(in)).matches())
 			{
-				String[] key = in.split(" ?=");
-				Double value = Double.parseDouble(key[1]);
-				settings.put(key[0].toLowerCase(), value);
-				System.out.println(key[0] + ": " + value);
+				String key = t.group(1);
+				Double value = Double.parseDouble(t.group(2));
+				doubleSettings.put(key.toLowerCase(), value);
+				System.out.println(key + ": " + value);
 			}
-			else if(!in.startsWith("#") && !in.startsWith("\n"))
+			else if((t = booleanpattern.matcher(in)).matches())
+			{
+				String key = t.group(1);
+				Boolean value = Boolean.parseBoolean(t.group(2));
+				booleanSettings.put(key.toLowerCase(), value);
+				System.out.println(key + ": " + value);
+			}
+			else if((t = stringpattern.matcher(in)).matches())
+			{
+				String key = t.group(1);
+				String value = t.group(2);
+				stringSettings.put(key.toLowerCase(), value);
+				System.out.println(key + ": " + value);
+			}
+			else if(!in.startsWith("#") && !in.isEmpty())
 			{
 				System.out.println("Could not parse line \"" + in + "\"");
 			}
