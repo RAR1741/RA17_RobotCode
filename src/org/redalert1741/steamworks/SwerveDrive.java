@@ -25,7 +25,7 @@ public class SwerveDrive implements Loggable
 	protected SwerveModule BRM;
 	protected SwerveModule BLM;
 	
-	SwerveDrive(CANTalon fr, CANTalon fra, AnalogInput fre, CANTalon fl, CANTalon fla, AnalogInput fle, CANTalon br, CANTalon bra, AnalogInput bre, CANTalon bl, CANTalon bla, AnalogInput ble)
+	public SwerveDrive(CANTalon fr, CANTalon fra, AnalogInput fre, CANTalon fl, CANTalon fla, AnalogInput fle, CANTalon br, CANTalon bra, AnalogInput bre, CANTalon bl, CANTalon bla, AnalogInput ble)
 	{
 		FRM = new SwerveModule(fr, fra, fre, "FR");
 		FLM = new SwerveModule(fl, fla, fle, "FL");
@@ -43,7 +43,7 @@ public class SwerveDrive implements Loggable
 		movecount = 0;
 	}
 	
-	void Swerve(double x, double y, double z, double gyro, boolean fieldOrient)
+	public void swerve(double x, double y, double z, double gyro, boolean fieldOrient)
 	{
 		gyro *= PI/180.0f;
 		z *= TurningSpeedFactor;
