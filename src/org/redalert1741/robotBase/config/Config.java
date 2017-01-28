@@ -100,34 +100,33 @@ public class Config
 		 * Optional ' ' around an '='
 		 * Match a number, with an optional '.' and more numbers
 		 */
-		Pattern doublepattern = Pattern.compile("^(#{0})[\\w\\d_]+\\s*?=\\s*?-?(\\d+)?(\\.\\d+)?$");
+		Pattern doublepattern = Pattern.compile("^#{0}([\\w\\d_]+)\\s*?=\\s*?(-?\\d*(?:\\.\\d+)?)$");
 		Pattern booleanpattern = Pattern.compile("^#{0}([\\w\\d_]+)\\s*?= ?([Tt]rue|[Ff]alse)$");
 		Pattern stringpattern = Pattern.compile("^#{0}([\\w\\d_]+)\\s*?=\\s*?\"([^\"]*)\"$");
 		Matcher t;
 		while(infile.hasNextLine())
 		{
 			String in = infile.nextLine();
-			if(doublepattern.matcher(in).matches())
+			if((t = doublepattern.matcher(in)).matches())
 			{
-				String[] key = in.split(" ?=");
-				Double value = Double.parseDouble(key[1]);
-				doubleSettings.put(key[0].toLowerCase(), value);
-				System.out.println(key[0] + ": " + value);
+				String key = t.group(1);
+				Double value = Double.parseDouble(t.group(2));
+				doubleSettings.put(key.toLowerCase(), value);
+				System.out.println(key + ": " + value);
 			}
 			else if((t = booleanpattern.matcher(in)).matches())
 			{
-				String[] key = in.split(" ?=");
-				Boolean value = Boolean.parseBoolean(key[1]);
-				booleanSettings.put(key[0].toLowerCase(), value);
-				System.out.println(key[0] + ": " + value);
+				String key = t.group(1);
+				Boolean value = Boolean.parseBoolean(t.group(2));
+				booleanSettings.put(key.toLowerCase(), value);
+				System.out.println(key + ": " + value);
 			}
 			else if((t = stringpattern.matcher(in)).matches())
 			{
-				String[] key = in.split(" ?=");
-				//stringpattern.matcher(in);
+				String key = t.group(1);
 				String value = t.group(2);
-				stringSettings.put(key[0].toLowerCase(), value);
-				System.out.println(key[0] + ": " + value);
+				stringSettings.put(key.toLowerCase(), value);
+				System.out.println(key + ": " + value);
 			}
 			else if(!in.startsWith("#") && !in.isEmpty())
 			{
