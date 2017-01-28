@@ -123,11 +123,11 @@ public class Robot extends IterativeRobot
     	logger.writeLine();
 		if(timer.get() >= 1 && timer.get() <= 5)
 		{
-			drive.SwerveAbsolute(0, -.4, 0, 0, false);
+			drive.swerveAbsolute(0, -.4, 0, 0, false);
 		}
 		else
 		{
-			drive.SwerveAbsolute(0, -.001, 0, 0, false);
+			drive.swerveAbsolute(0, -.001, 0, 0, false);
 		}
 	}
 
