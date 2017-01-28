@@ -3,30 +3,23 @@ package org.redalert1741.steamworks;
 import java.io.File;
 import java.util.Calendar;
 
-import org.redalert1741.robotBase.config.Config;
-import org.redalert1741.robotBase.input.EdgeDetect;
-import org.redalert1741.robotBase.input.XBox360Controller;
-import org.redalert1741.robotBase.logging.DataLogger;
+import org.redalert1741.robotBase.logging.*;
+import org.redalert1741.robotBase.config.*;
+import org.redalert1741.robotBase.input.*;
 
 import com.ctre.CANTalon;
 
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.SPI.Port;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends IterativeRobot
 {
 	//private static LoggableNavX navx;
 	private static DataLogger logger;
 	private static Timer timer;
+	@SuppressWarnings("unused")
 	private String auto = "";
+	
 	private double[] maxEncValue = new double[4];
 	
 	SwerveDrive drive;
