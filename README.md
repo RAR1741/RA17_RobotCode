@@ -3,3 +3,7 @@ Red Alert's 2017 Robot Code
 
 ### Requirements
 * TalonSRX library
+
+### Uses
+* NavX Library
+* Gson
