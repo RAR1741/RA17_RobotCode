@@ -13,10 +13,14 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 
+import edu.wpi.first.wpilibj.Timer;
+
 public class JsonAutonomous extends Autonomous
 {
 	private JsonElement auto;
 	private List<AutoInstruction> instructions;
+	private int step;
+	private Timer timer;
 	
 	private enum Unit { Seconds, Milliseconds, EncoderTicks, Rotations, Inches, Feet, Invalid };
 	
@@ -37,6 +41,8 @@ public class JsonAutonomous extends Autonomous
 	
 	public JsonAutonomous(String file)
 	{
+		step = -1;
+		timer = new Timer();
 		instructions = new ArrayList<AutoInstruction>();
 		try
 		{
@@ -70,20 +76,30 @@ public class JsonAutonomous extends Autonomous
 	@Override
 	public void run()
 	{
-		for(AutoInstruction ai : instructions)
+		if(step == -1)
 		{
-			if(ai.type.equals("drive"))
+			timer.reset();
+			timer.start();
+		}
+		AutoInstruction ai = instructions.get(step);
+		if(ai.type.equals("drive"))
+		{
+			System.out.println("Drive x: " + ai.args.get(0) + ", y: " + ai.args.get(1) + ", z: " + ai.args.get(2) + ", " + ai.amount + " " + ai.unit);
+			if(ai.unit.equals(Unit.Seconds))
 			{
-				System.out.println("Drive x: " + ai.args.get(0) + ", y: " + ai.args.get(1) + ", z: " + ai.args.get(2) + ", " + ai.amount + " " + ai.unit);
+				if(timer.get() < ai.amount)
+				{
+					Robot.
+				}
 			}
-			else if(ai.type.equals("gear"))
-			{
-				System.out.println("Gear " + (ai.args.get(0)==1?"open":"close"));
-			}
-			else if(ai.type.equals("wait"))
-			{
-				System.out.println("Wait " + ai.amount + " " + ai.unit);
-			}
+		}
+		else if(ai.type.equals("gear"))
+		{
+			System.out.println("Gear " + (ai.args.get(0)==1?"open":"close"));
+		}
+		else if(ai.type.equals("wait"))
+		{
+			System.out.println("Wait " + ai.amount + " " + ai.unit);
 		}
 	}
 
