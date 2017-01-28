@@ -29,33 +29,33 @@ public class Robot extends IterativeRobot
 	private String auto = "";
 	private double[] maxEncValue = new double[4];
 	
-	SwerveDrive drive;
-	XboxController driver;
-	EdgeDetect driveMode;
+	public static SwerveDrive drive;
+	private static XboxController driver;
+	private static EdgeDetect driveMode;
 	
-	CANTalon FR;
-	CANTalon FRa;
-	CANTalon FL;
-	CANTalon FLa;
-	CANTalon BR;
-	CANTalon BRa;
-	CANTalon BL;
-	CANTalon BLa;
-	AnalogInput FRe;
-	AnalogInput FLe;
-	AnalogInput BRe;
-	AnalogInput BLe;
+	private static CANTalon FR;
+	private static CANTalon FRa;
+	private static CANTalon FL;
+	private static CANTalon FLa;
+	private static CANTalon BR;
+	private static CANTalon BRa;
+	private static CANTalon BL;
+	private static CANTalon BLa;
+	private static AnalogInput FRe;
+	private static AnalogInput FLe;
+	private static AnalogInput BRe;
+	private static AnalogInput BLe;
 	
-	PIDController driveAimer;
-	FakePIDSource cameraSource;
-	FakePIDOutput driveOutput;
+	private static PIDController driveAimer;
+	private static FakePIDSource cameraSource;
+	private static FakePIDOutput driveOutput;
 	
-	double x;
-	double y;
-	double twist;
-	double autoAimOffset;
-	boolean fieldOrient = true;
-	boolean configReload;
+	private double x;
+	private double y;
+	private double twist;
+	private double autoAimOffset;
+	private boolean fieldOrient = true;
+	private boolean configReload;
 	
 	@Override
 	public void robotInit()
