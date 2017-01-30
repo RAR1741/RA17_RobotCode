@@ -87,11 +87,7 @@ public class JsonAutonomous extends Autonomous
 			System.out.println("Drive x: " + ai.args.get(0) + ", y: " + ai.args.get(1) + ", z: " + ai.args.get(2) + ", " + ai.amount + " " + ai.unit);
 			if(ai.unit.equals(Unit.Seconds))
 			{
-				if(timer.get() < ai.amount)
-				{
-					Robot.drive.swerveAbsolute(ai.args.get(0), ai.args.get(1), ai.args.get(2), 0, false);
-				}
-				else
+				if(driveTime(ai.args.get(0), ai.args.get(1), ai.args.get(2), ai.amount))
 				{
 					step++;
 					timer.reset();
@@ -107,6 +103,19 @@ public class JsonAutonomous extends Autonomous
 		{
 			System.out.println("Wait " + ai.amount + " " + ai.unit);
 		}
+	}
+	
+	private boolean driveTime(double x, double y, double z, double t)
+	{
+		if(timer.get() < t)
+		{
+			Robot.drive.swerveAbsolute(x, y, z, 0, false);
+		}
+		else
+		{
+			return true;
+		}
+		return false;
 	}
 
 }
