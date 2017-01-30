@@ -89,7 +89,13 @@ public class JsonAutonomous extends Autonomous
 			{
 				if(timer.get() < ai.amount)
 				{
-					Robot.
+					Robot.drive.swerveAbsolute(ai.args.get(0), ai.args.get(1), ai.args.get(2), 0, false);
+				}
+				else
+				{
+					step++;
+					timer.reset();
+					timer.start();
 				}
 			}
 		}
