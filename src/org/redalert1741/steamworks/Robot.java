@@ -65,17 +65,17 @@ public class Robot extends IterativeRobot
 //            DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
 //      }
 		FRe = new AnalogInput(0);
-		FLe = new AnalogInput(3);
-		BRe = new AnalogInput(2);
-		BLe = new AnalogInput(4);
+		FLe = new AnalogInput(2);
+		BRe = new AnalogInput(3);
+		BLe = new AnalogInput(1);
 	   	FR = new CANTalon(1);
-    	FRa = new CANTalon(2);
+    	FRa = new CANTalon(5);
     	FL = new CANTalon(3);
-    	FLa = new CANTalon(4);
-    	BR = new CANTalon(5);
-    	BRa = new CANTalon(6);
-    	BL = new CANTalon(7);
-    	BLa = new CANTalon(8);
+    	FLa = new CANTalon(7);
+    	BR = new CANTalon(4);
+    	BRa = new CANTalon(8);
+    	BL = new CANTalon(2);
+    	BLa = new CANTalon(6);
 		drive = new SwerveDrive(FR, FRa, FRe, FL, FLa, FLe, BR, BRa, BRe, BL, BLa, BLe);
 		////////////////////////////////////////////////
 		driver = new XboxController(4);
