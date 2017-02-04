@@ -134,8 +134,12 @@ public class Robot extends IterativeRobot
     		fieldOrient = !fieldOrient;
     	}
     	
-    	drive.Swerve(x,y,twist,0,fieldOrient);
-    	ReloadConfig();
+    	drive.Swerve(-x,-y,-twist,0,fieldOrient);
+    	if(driver.getAButton())
+    	{
+        	ReloadConfig();
+    	}
+    	logger.log();
 	}
 
 	@Override
@@ -154,7 +158,8 @@ public class Robot extends IterativeRobot
 	{
 		logger.log();
 		logger.writeLine();
-    	drive.Swerve(0,0.3,0,0,fieldOrient);
+//    	drive.Swerve(0,0.3,0,0,fieldOrient);
+		drive.Swerve(0,0,0,0,fieldOrient);
     	if(driver.getBackButton())
     	{
     		ReloadConfig();
@@ -191,6 +196,7 @@ public class Robot extends IterativeRobot
 	void SetupLogging()
 	{
 		logger.addLoggable(drive);
+		logger.setupLoggables();
 		//logger.addLoggable(navx);
 		logger.addAttribute("Time");
 		logger.addAttribute("AccX");
