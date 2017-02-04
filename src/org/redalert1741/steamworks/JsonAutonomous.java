@@ -21,6 +21,9 @@ public class JsonAutonomous extends Autonomous
 	private List<AutoInstruction> instructions;
 	private int step;
 	private Timer timer;
+	private double start;
+	private final double TICKS_PER_ROTATION = 133.4;
+	private final double TICKS_PER_INCH = TICKS_PER_ROTATION / (4 * Math.PI);
 	
 	private enum Unit { Seconds, Milliseconds, EncoderTicks, Rotations, Inches, Feet, Invalid };
 	
@@ -78,20 +81,32 @@ public class JsonAutonomous extends Autonomous
 	{
 		if(step == -1)
 		{
-			timer.reset();
-			timer.start();
+			reset();
 		}
 		AutoInstruction ai = instructions.get(step);
 		if(ai.type.equals("drive"))
 		{
 			System.out.println("Drive x: " + ai.args.get(0) + ", y: " + ai.args.get(1) + ", z: " + ai.args.get(2) + ", " + ai.amount + " " + ai.unit);
-			if(ai.unit.equals(Unit.Seconds))
+			Unit u = ai.unit;
+			if(u.equals(Unit.Seconds) || u.equals(Unit.Milliseconds))
 			{
-				if(driveTime(ai.args.get(0), ai.args.get(1), ai.args.get(2), ai.amount))
+				if(driveTime(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.Seconds) ? ai.amount : ai.amount/1000.0)))
 				{
-					step++;
-					timer.reset();
-					timer.start();
+					reset();
+				}
+			}
+			else if(u.equals(Unit.EncoderTicks) || u.equals(Unit.Rotations))
+			{
+				if(driveDistance(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.EncoderTicks) ? ai.amount : ai.amount/TICKS_PER_ROTATION)))
+				{
+					reset();
+				}
+			}
+			else if(u.equals(Unit.Feet) || u.equals(Unit.Inches))
+			{
+				if(driveDistance(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.Inches) ? ai.amount/TICKS_PER_INCH : (ai.amount/TICKS_PER_INCH))/12.0))
+				{
+					reset();
 				}
 			}
 		}
@@ -116,6 +131,27 @@ public class JsonAutonomous extends Autonomous
 			return true;
 		}
 		return false;
+	}
+	
+	private boolean driveDistance(double x, double y, double z, double a)
+	{
+		if(Robot.drive.FRM.getDriveEnc()-start < a)
+		{
+			Robot.drive.swerveAbsolute(x, y, z, 0, false);
+		}
+		else
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	private void reset()
+	{
+		step++;
+		timer.reset();
+		timer.start();
+		start = Robot.drive.FRM.getDriveEnc();
 	}
 
 }
