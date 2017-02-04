@@ -16,6 +16,12 @@ public class Climber implements Loggable
 		climber2 = new Spark(c2);
 	}
 	
+	public void climb(double speed)
+	{
+		climber1.set(speed);
+		climber2.set(-speed);
+	}
+	
 	@Override
 	public void setupLogging(DataLogger logger)
 	{
