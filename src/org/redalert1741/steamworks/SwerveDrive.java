@@ -25,7 +25,7 @@ public class SwerveDrive implements Loggable
 	protected SwerveModule BRM;
 	protected SwerveModule BLM;
 	
-	SwerveDrive(CANTalon fr, CANTalon fra, AnalogInput fre, CANTalon fl, CANTalon fla, AnalogInput fle, CANTalon br, CANTalon bra, AnalogInput bre, CANTalon bl, CANTalon bla, AnalogInput ble)
+	public SwerveDrive(CANTalon fr, CANTalon fra, AnalogInput fre, CANTalon fl, CANTalon fla, AnalogInput fle, CANTalon br, CANTalon bra, AnalogInput bre, CANTalon bl, CANTalon bla, AnalogInput ble)
 	{
 		FRM = new SwerveModule(fr, fra, fre, "FR");
 		FLM = new SwerveModule(fl, fla, fle, "FL");
@@ -43,7 +43,7 @@ public class SwerveDrive implements Loggable
 		movecount = 0;
 	}
 	
-	void Swerve(double x, double y, double z, double gyro, boolean fieldOrient)
+	public void swerve(double x, double y, double z, double gyro, boolean fieldOrient)
 	{
 		gyro *= PI/180.0f;
 		z *= TurningSpeedFactor;
@@ -123,43 +123,7 @@ public class SwerveDrive implements Loggable
 			movecount--;
 			if(movecount < 0)
 			{
-				a = 0 - 0 * (length/diameter);
-				b = 0 + 0 * (length/diameter);
-				c = 0 - 0 * (width/diameter);
-				d = 0 + 0 * (width/diameter);
-		
-				ws1 = Math.sqrt(Math.pow(b,2) + Math.pow(c,2));
-				ws2 = Math.sqrt(Math.pow(b,2) + Math.pow(d,2));
-				ws3 = Math.sqrt(Math.pow(a,2) + Math.pow(d,2));
-				ws4 = Math.sqrt(Math.pow(a,2) + Math.pow(c,2));
-				max = 0;
-				if(ws1 > max){max = ws1;}
-				if(ws2 > max){max = ws2;}
-				if(ws3 > max){max = ws3;}
-				if(ws4 > max){max = ws4;}
-				if(max > 1){ws1 /= max;ws2 /= max;ws3 /= max;ws4 /= max;}
-
-				wa1 = Math.atan2(b,c) * 180.0f/PI;
-				wa2 = Math.atan2(b,d) * 180.0f/PI;
-				wa3 = Math.atan2(a,d) * 180.0f/PI;
-				wa4 = Math.atan2(a,c) * 180.0f/PI;
-				if(wa1 < 0){wa1 += 360;}//wa1 = FL
-				if(wa2 < 0){wa2 += 360;}//wa2 = FR
-				if(wa3 < 0){wa3 += 360;}//wa3 = BR
-				if(wa4 < 0){wa4 += 360;}//wa4 = BL
-				FRM.PIDSet();
-				FLM.PIDSet();
-				BRM.PIDSet();
-				BLM.PIDSet();
-				FRM.setDrive(ws2);
-				FLM.setDrive(-ws1);
-				BRM.setDrive(ws3);
-				BLM.setDrive(-ws4);
-				
-				FRM.setAngle(wa2);
-				FLM.setAngle(wa1);
-				BRM.setAngle(wa3);
-				BLM.setAngle(wa4);
+				swerveAbsolute(0, 0, 0, 0, false);
 			}
 			else
 			{
@@ -173,6 +137,76 @@ public class SwerveDrive implements Loggable
 				BLM.setDrive(0);
 			}
 		}
+	}
+	
+	public void swerveAbsolute(double x, double y, double z, double gyro, boolean fieldOrient)
+	{
+		gyro *= PI/180.0f;
+		z *= TurningSpeedFactor;
+		if(fieldOrient)
+		{
+			temp = y * Math.cos(gyro) + x * Math.sin(gyro);
+			x = -y * Math.sin(gyro) + x * Math.cos(gyro);
+			y = temp;
+		}
+
+		a = x - z * (length/diameter);
+		b = x + z * (length/diameter);
+		c = y - z * (width/diameter);
+		d = y + z * (width/diameter);
+
+		ws1 = Math.sqrt(Math.pow(b,2) + Math.pow(c,2));
+		ws2 = Math.sqrt(Math.pow(b,2) + Math.pow(d,2));
+		ws3 = Math.sqrt(Math.pow(a,2) + Math.pow(d,2));
+		ws4 = Math.sqrt(Math.pow(a,2) + Math.pow(c,2));
+		max = 0;
+		if(ws1 > max){max = ws1;}
+		if(ws2 > max){max = ws2;}
+		if(ws3 > max){max = ws3;}
+		if(ws4 > max){max = ws4;}
+		if(max > 1){ws1 /= max;ws2 /= max;ws3 /= max;ws4 /= max;}
+
+		wa1 = Math.atan2(b,c) * 180.0f/PI;
+		wa2 = Math.atan2(b,d) * 180.0f/PI;
+		wa3 = Math.atan2(a,d) * 180.0f/PI;
+		wa4 = Math.atan2(a,c) * 180.0f/PI;
+		if(wa1 < 0){wa1 += 360;}//wa1 = FL
+		if(wa2 < 0){wa2 += 360;}//wa2 = FR
+		if(wa3 < 0){wa3 += 360;}//wa3 = BR
+		if(wa4 < 0){wa4 += 360;}//wa4 = BL
+		FRM.PIDSet();
+		FLM.PIDSet();
+		BRM.PIDSet();
+		BLM.PIDSet();
+		
+		FRM.setDrive(ws2);
+		FLM.setDrive(-ws1);
+		BRM.setDrive(ws3);
+		BLM.setDrive(-ws4);
+		System.out.println(wa1);
+		System.out.println(wa2);
+		System.out.println(wa3);
+		System.out.println(wa4);
+		FRM.setAngle(wa2);
+		FLM.setAngle(wa1);
+		BRM.setAngle(wa3);
+		BLM.setAngle(wa4);
+	}
+	
+	public void angleToZero()
+	{
+		FRM.PIDSet();
+		FLM.PIDSet();
+		BRM.PIDSet();
+		BLM.PIDSet();
+		FRM.setDrive(0);
+		FLM.setDrive(0);
+		BRM.setDrive(0);
+		BLM.setDrive(0);
+		FRM.setAngle(0);
+		FLM.setAngle(0);
+		BRM.setAngle(0);
+		BLM.setAngle(0);
 	}
 	
 	public double[] calibrateAngle()
@@ -203,7 +237,7 @@ public class SwerveDrive implements Loggable
 		BLM.log(logger);
 	}
 
-	void ReloadConfig()
+	public void ReloadConfig()
 	{
 		length = Config.getSetting("FrameLength",1);
 		width = Config.getSetting("FrameWidth",1);
