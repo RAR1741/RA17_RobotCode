@@ -24,6 +24,8 @@ public class Robot extends IterativeRobot
 	private double[] maxEncValue = new double[4];
 	
 	public static SwerveDrive drive;
+	public static Climber climber;
+	
 	private static XboxController driver;
 	private static EdgeDetect driveMode;
 	
@@ -93,6 +95,7 @@ public class Robot extends IterativeRobot
 		driveAimer.setInputRange(-24,24);
 		driveAimer.setOutputRange(-.3,.3);
 		driveAimer.setAbsoluteTolerance(.5);
+		climber = new Climber(0, 1);
 		ReloadConfig();
 	}
 
@@ -160,6 +163,12 @@ public class Robot extends IterativeRobot
     	}
     	
     	drive.swerve(x,y,twist,0,fieldOrient);
+    	
+    	if(driver.getTriggerAxis(Hand.kRight) > 0.1)
+    	{
+    		climber.climb(driver.getTriggerAxis(Hand.kRight));
+    	}
+    	
     	if(driver.getBackButton())
     	{
     		ReloadConfig();
