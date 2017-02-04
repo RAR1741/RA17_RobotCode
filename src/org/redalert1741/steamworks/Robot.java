@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 
 public class Robot extends IterativeRobot
 {
-	//private static LoggableNavX navx;
+	private static LoggableNavX navx;
 	private static DataLogger logger;
 	private static Timer timer;
 	@SuppressWarnings("unused")
@@ -22,33 +22,33 @@ public class Robot extends IterativeRobot
 	
 	private double[] maxEncValue = new double[4];
 	
-	SwerveDrive drive;
-	XboxController driver;
-	EdgeDetect driveMode;
+	public static SwerveDrive drive;
+	private static XboxController driver;
+	private static EdgeDetect driveMode;
 	
-	CANTalon FR;
-	CANTalon FRa;
-	CANTalon FL;
-	CANTalon FLa;
-	CANTalon BR;
-	CANTalon BRa;
-	CANTalon BL;
-	CANTalon BLa;
-	AnalogInput FRe;
-	AnalogInput FLe;
-	AnalogInput BRe;
-	AnalogInput BLe;
+	private static CANTalon FR;
+	private static CANTalon FRa;
+	private static CANTalon FL;
+	private static CANTalon FLa;
+	private static CANTalon BR;
+	private static CANTalon BRa;
+	private static CANTalon BL;
+	private static CANTalon BLa;
+	private static AnalogInput FRe;
+	private static AnalogInput FLe;
+	private static AnalogInput BRe;
+	private static AnalogInput BLe;
 	
-	PIDController driveAimer;
-	FakePIDSource cameraSource;
-	FakePIDOutput driveOutput;
+	private static PIDController driveAimer;
+	private static FakePIDSource cameraSource;
+	private static FakePIDOutput driveOutput;
 	
-	double x;
-	double y;
-	double twist;
-	double autoAimOffset;
-	boolean fieldOrient = true;
-	boolean configReload;
+	private double x;
+	private double y;
+	private double twist;
+	private double autoAimOffset;
+	private boolean fieldOrient = true;
+	private boolean configReload;
 	
 	@Override
 	public void robotInit()
@@ -56,26 +56,26 @@ public class Robot extends IterativeRobot
 		timer = new Timer();
 		logger = new DataLogger();
 		Config.loadFromFile("/home/lvuser/config.txt");
-//		try
-//		{
-//			navx = new LoggableNavX(Port.kMXP);
-//      }
-//		catch (RuntimeException ex )
-//		{
-//            DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
-//      }
+		try
+		{
+			navx = new LoggableNavX(Port.kMXP);
+		}
+		catch (RuntimeException ex )
+		{
+            DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
+		}
 		FRe = new AnalogInput(0);
-		FLe = new AnalogInput(3);
-		BRe = new AnalogInput(2);
-		BLe = new AnalogInput(4);
+		FLe = new AnalogInput(2);
+		BRe = new AnalogInput(3);
+		BLe = new AnalogInput(1);
 	   	FR = new CANTalon(1);
-    	FRa = new CANTalon(2);
+    	FRa = new CANTalon(5);
     	FL = new CANTalon(3);
-    	FLa = new CANTalon(4);
-    	BR = new CANTalon(5);
-    	BRa = new CANTalon(6);
-    	BL = new CANTalon(7);
-    	BLa = new CANTalon(8);
+    	FLa = new CANTalon(7);
+    	BR = new CANTalon(4);
+    	BRa = new CANTalon(8);
+    	BL = new CANTalon(2);
+    	BLa = new CANTalon(6);
 		drive = new SwerveDrive(FR, FRa, FRe, FL, FLa, FLe, BR, BRa, BRe, BL, BLa, BLe);
 		////////////////////////////////////////////////
 		driver = new XboxController(4);
@@ -92,24 +92,44 @@ public class Robot extends IterativeRobot
 		driveAimer.setInputRange(-24,24);
 		driveAimer.setOutputRange(-.3,.3);
 		driveAimer.setAbsoluteTolerance(.5);
+		ReloadConfig();
 	}
 
 	@Override
 	public void autonomousInit()
 	{
-		
+		timer.reset();
+		timer.start();
+		ReloadConfig();
+		drive.angleToZero();
+		StartLogging("auto",logger);
+		logger.addLoggable(navx);
+	    logger.addLoggable(drive);
+	    logger.setupLoggables();
+	    logger.writeAttributes();
 	}
 
 	@Override
 	public void autonomousPeriodic()
 	{
-		
+    	logger.log();
+    	logger.writeLine();
+		if(timer.get() >= 1 && timer.get() <= 5)
+		{
+			drive.swerveAbsolute(0, -.4, 0, 0, false);
+		}
+		else
+		{
+			drive.swerveAbsolute(0, -.001, 0, 0, false);
+		}
 	}
 
 	@Override
     public void teleopInit()
     { StartLogging("teleop",logger)
-    ; SetupLogging()
+    ; logger.addLoggable(navx)
+    ; logger.addLoggable(drive)
+    ; logger.writeAttributes()
     ; ReloadConfig()
     ; timer.reset()
     ; timer.start()
@@ -118,6 +138,9 @@ public class Robot extends IterativeRobot
 	@Override
 	public void teleopPeriodic()
 	{
+    	logger.log();
+    	logger.writeLine();
+    	
     	x = driver.getX(Hand.kLeft);
     	y = driver.getY(Hand.kLeft);
     	twist = driver.getX(Hand.kRight);
@@ -134,8 +157,11 @@ public class Robot extends IterativeRobot
     		fieldOrient = !fieldOrient;
     	}
     	
-    	drive.Swerve(x,y,twist,0,fieldOrient);
-    	ReloadConfig();
+    	drive.swerve(x,y,twist,0,fieldOrient);
+    	if(driver.getBackButton())
+    	{
+    		ReloadConfig();
+    	}
 	}
 
 	@Override
@@ -144,7 +170,7 @@ public class Robot extends IterativeRobot
 		timer.reset();
 		timer.start();
 		logger.open("/home/lvuser/navxTest.log");
-		//logger.addLoggable(navx);
+		logger.addLoggable(navx);
 		logger.setupLoggables();
 		logger.writeAttributes();
 	}
@@ -154,7 +180,7 @@ public class Robot extends IterativeRobot
 	{
 		logger.log();
 		logger.writeLine();
-    	drive.Swerve(0,0.3,0,0,fieldOrient);
+    	drive.swerve(0,0,0,0,fieldOrient);
     	if(driver.getBackButton())
     	{
     		ReloadConfig();
@@ -191,14 +217,15 @@ public class Robot extends IterativeRobot
 	void SetupLogging()
 	{
 		logger.addLoggable(drive);
-		//logger.addLoggable(navx);
+    logger.addLoggable(navx);
+		logger.setupLoggables();
 		logger.addAttribute("Time");
 		logger.addAttribute("AccX");
 		logger.addAttribute("AccY");
 		logger.addAttribute("AccZ");
-		//drive.setupLogging(logger);
 		logger.writeAttributes();
 	}
+	
 	
 	void ReloadConfig()
 	{
