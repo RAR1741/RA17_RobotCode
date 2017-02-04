@@ -29,7 +29,7 @@ public class SwerveModule implements Loggable
 		SteerP = Config.getSetting("steerP",2);
 		SteerI = Config.getSetting("steerI",0);
 		SteerD = Config.getSetting("steerD",0);
-		SteerTolerance = Config.getSetting("Steering%Tolerance", .25);
+		SteerTolerance = Config.getSetting("SteeringTolerance", .25);
 		SteerSpeed = Config.getSetting("SteerSpeed", 1);
 		SteerEncMax = Config.getSetting("SteerEncMax",4.792);
 		SteerOffset = Config.getSetting("SteerEncOffset",0);
@@ -150,12 +150,12 @@ public class SwerveModule implements Loggable
 	public void ReloadConfig(String s)
 	{
 	/////////////////////////////////////////////////////
-		SteerP = Config.getSetting("steerP",2);
-		SteerI = Config.getSetting("steerI",0);
-		SteerD = Config.getSetting("steerD",0);
+		SteerP = Config.getSetting("steerP"+s,2);
+		SteerI = Config.getSetting("steerI"+s,0);
+		SteerD = Config.getSetting("steerD"+s,0);
 		PIDc.setPID(SteerP,SteerI,SteerD);
 	///////////////////////////////////////////////////////////////////
-		SteerTolerance = Config.getSetting("Steering%Tolerance", 0.25);
+		SteerTolerance = Config.getSetting("SteeringTolerance", 0.25);
 		SteerSpeed = Config.getSetting("SteerSpeed", 1);
 		SteerEncMax = Config.getSetting("SteerEncMax" + s,4.792);
 		PIDc.setInputRange(0,SteerEncMax);

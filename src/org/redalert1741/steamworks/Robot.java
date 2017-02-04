@@ -130,6 +130,7 @@ public class Robot extends IterativeRobot
     { StartLogging("teleop",logger)
     ; logger.addLoggable(navx)
     ; logger.addLoggable(drive)
+    ; logger.setupLoggables()
     ; logger.writeAttributes()
     ; ReloadConfig()
     ; timer.reset()
