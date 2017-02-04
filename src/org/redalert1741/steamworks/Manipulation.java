@@ -3,12 +3,12 @@ package org.redalert1741.steamworks;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
-public class Collection 
+public class Manipulation 
 {
 	CANTalon input;
 	CANTalon output;
 	
-	public Collection(CANTalon in,CANTalon out)
+	public Manipulation(CANTalon in,CANTalon out)
 	{
 		input = in;
 		output = out;
