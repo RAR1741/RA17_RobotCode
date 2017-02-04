@@ -11,6 +11,7 @@ import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.SPI.Port;
 
 public class Robot extends IterativeRobot
 {
