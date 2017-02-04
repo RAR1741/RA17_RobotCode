@@ -26,6 +26,9 @@ public class LoggableNavX extends AHRS implements Loggable
 		logger.addAttribute("navx_Temp");
 		logger.addAttribute("navx_Bar");
 		logger.addAttribute("navx_Alt");
+		logger.addAttribute("navx_XDis");
+		logger.addAttribute("navx_YDis");
+		logger.addAttribute("navx_YAcc");
 	}
 
 	@Override
@@ -40,5 +43,7 @@ public class LoggableNavX extends AHRS implements Loggable
 		logger.log("navx_Temp", getTempC());
 		logger.log("navx_Bar", getBarometricPressure());
 		logger.log("navx_Alt", getAltitude());
+		logger.log("navx_XDis", getDisplacementX());
+		logger.log("navx_YDis", getDisplacementY());
 	}
 }
