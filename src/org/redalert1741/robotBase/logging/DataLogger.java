@@ -22,6 +22,10 @@ public class DataLogger
 		fields = new LinkedHashMap<String,String>();
 		loggables = new ArrayList<>();
 		table = NetworkTable.getTable("logging");
+		for(String s : table.getKeys())
+		{
+			table.delete(s);
+		}
 	}
 
 	public boolean open(String filename)
