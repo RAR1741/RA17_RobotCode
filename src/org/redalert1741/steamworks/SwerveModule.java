@@ -165,4 +165,9 @@ public class SwerveModule implements Loggable
 		SteerOffset = Config.getSetting("SteerEncOffset" + s,0);
 		encFake.setOffset(SteerOffset);
 	}
+	
+	public double getDriveEnc()
+	{
+		return drive.getEncPosition();
+	}
 }
