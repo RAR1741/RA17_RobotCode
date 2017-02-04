@@ -19,7 +19,7 @@ public class Climber implements Loggable
 	public void climb(double speed)
 	{
 		climber1.set(speed);
-		climber2.set(-speed);
+		climber2.set(speed);
 	}
 	
 	@Override
