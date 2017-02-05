@@ -7,21 +7,18 @@ import org.redalert1741.robotBase.logging.Loggable;
 import com.ctre.CANTalon;
 import com.ctre.CANTalon.TalonControlMode;
 
+import edu.wpi.first.wpilibj.Spark;
+
 public class GearPlacer implements Loggable,Configurable
 {
-	CANTalon M;
+	Spark M;
 	GearPlacerState state;
 	double motorSpeed;
 
 	
-	public GearPlacer(CANTalon m)
+	public GearPlacer(Spark m)
 	{
 		M = m;
-		M.changeControlMode(TalonControlMode.PercentVbus);
-		M.ConfigFwdLimitSwitchNormallyOpen(true);
-		M.ConfigRevLimitSwitchNormallyOpen(true);
-		M.enable();
-		
 		motorSpeed = Config.getSetting("gearMotorSpeed", 0.5);
 	}
 	

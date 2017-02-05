@@ -100,7 +100,7 @@ public class Robot extends IterativeRobot
 		climber = new Climber(0, 1);
 		ReloadConfig();
 	}
-
+//========================================================================================================
 	@Override
 	public void autonomousInit()
 	{
@@ -111,7 +111,7 @@ public class Robot extends IterativeRobot
 	@Override
 	public void autonomousPeriodic()
 	{
-    	Log(timer.get());
+    	log(timer.get());
 		if(timer.get() >= 1 && timer.get() <= 5)
 		{
 			drive.swerveAbsolute(0, -.4, 0, 0, false);
@@ -121,7 +121,7 @@ public class Robot extends IterativeRobot
 			drive.swerveAbsolute(0, -.001, 0, 0, false);
 		}
 	}
-
+//========================================================================================================
 	@Override
     public void teleopInit()
     { setupPeriodic("teleop")
@@ -132,7 +132,7 @@ public class Robot extends IterativeRobot
 	{
     	///////////////////////////////////////////////////////////////////////////
     	//Utility
-    	Log(timer.get());
+    	log(timer.get());
     	if(driver.getBackButton())
     	{
     		ReloadConfig();
@@ -167,7 +167,7 @@ public class Robot extends IterativeRobot
     	}
 
 	}
-
+//========================================================================================================
 	@Override
 	public void testInit()
 	{
@@ -177,7 +177,7 @@ public class Robot extends IterativeRobot
 	@Override
 	public void testPeriodic()
 	{
-		Log(timer.get());
+		log(timer.get());
     	drive.swerve(0,0,0,0,fieldOrient);
     	if(driver.getBackButton())
     	{
@@ -193,17 +193,17 @@ public class Robot extends IterativeRobot
     		}
     	}
 	}
-	
+//========================================================================================================
 	public void setupPeriodic(String period)
 	{
 		timer.reset();
 		timer.start();
 		ReloadConfig();
-		StartLogging(period,logger);
-		SetupLogging();
+		startLogging(period,logger);
+		setupLogging();
 	}
 	
-	void StartLogging(String mode, DataLogger l)
+	void startLogging(String mode, DataLogger l)
 	{
 		String robot = !(Config.getSetting("isPrototype", 0) == 0) ? "_proto" : "_comp";
 		l.close();
@@ -221,7 +221,7 @@ public class Robot extends IterativeRobot
 		l.open(name);
 	}
 
-	void SetupLogging()
+	void setupLogging()
 	{
 		logger.addAttribute("Time");
 		logger.addLoggable(drive);
@@ -230,13 +230,12 @@ public class Robot extends IterativeRobot
 		logger.writeAttributes();
 	}
 	
-	void Log(double time)
+	void log(double time)
 	{
 		logger.log("Time", time);
 		logger.log();
 		logger.writeLine();
 	}
-	
 	
 	void ReloadConfig()
 	{
