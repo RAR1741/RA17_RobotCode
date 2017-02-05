@@ -162,11 +162,15 @@ public class Robot extends IterativeRobot
     		fieldOrient = !fieldOrient;
     	}
     	
-    	drive.swerve(x,y,twist,0,fieldOrient);
+    	drive.swerve(-x,-y,-twist,0,fieldOrient);
     	
     	if(driver.getTriggerAxis(Hand.kRight) > 0.1)
     	{
     		climber.climb(driver.getTriggerAxis(Hand.kRight));
+    	}
+    	else
+    	{
+    		climber.climb(0);
     	}
     	
     	if(driver.getBackButton())
