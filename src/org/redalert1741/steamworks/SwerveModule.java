@@ -100,16 +100,30 @@ public class SwerveModule implements Loggable
 	public double calibrateAngle() 
 	{
 		double max = 0;
-		double tmp = 0;
 		Timer t = new Timer();
 		t.reset();
 		t.start();
 		angle.changeControlMode(TalonControlMode.PercentVbus);
-		
+		PIDSet();
+		PIDc.setSetpoint(0);
 		while(t.get() <= 5)
 		{
-			angle.set(tmp);
-			tmp+=0.01;
+			if(encoder.getVoltage() > 0.25 && encoder.getVoltage() < 0.75)
+			{
+				encFake.pidSetAbsolute(encoder.pidGet());
+				PIDc.setSetpoint(4.6);
+			}
+			else if(encoder.getVoltage() < 4.8 && encoder.getVoltage() > 4.5)
+			{
+				encFake.pidSetAbsolute(encoder.pidGet());
+				PIDc.setSetpoint(0.35);
+			}
+			else
+			{
+				encFake.pidSetAbsolute(encoder.pidGet());
+				PIDc.setSetpoint(0);
+			}
+			
 			if(encoder.getVoltage() > max)
 			{
 				max = encoder.getVoltage();
