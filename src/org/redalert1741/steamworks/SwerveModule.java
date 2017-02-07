@@ -82,6 +82,12 @@ public class SwerveModule implements Loggable
 		return encFake.pidGet();
 	}
 	
+	public void setEncMax(double max)
+	{
+		encFake.setMinMax(0, max);
+		PIDc.setInputRange(0, max);
+	}
+	
 	public double getEncMax()
 	{
 		return SteerEncMax;
@@ -118,7 +124,7 @@ public class SwerveModule implements Loggable
 				encFake.pidSetAbsolute(encoder.pidGet());
 				PIDc.setSetpoint(0.35);
 			}
-			else
+			else if(encoder.getVoltage() < 4.5 && encoder.getVoltage() > .75)
 			{
 				encFake.pidSetAbsolute(encoder.pidGet());
 				PIDc.setSetpoint(0);
@@ -173,6 +179,7 @@ public class SwerveModule implements Loggable
 		SteerSpeed = Config.getSetting("SteerSpeed", 1);
 		SteerEncMax = Config.getSetting("SteerEncMax" + s,4.792);
 		PIDc.setInputRange(0,SteerEncMax);
+		encFake.setMinMax(0, SteerEncMax);
 		PIDc.setOutputRange(-SteerSpeed,SteerSpeed);
 		PIDc.setPercentTolerance(SteerTolerance);
 	/////////////////////////////////////////////////////

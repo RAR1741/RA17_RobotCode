@@ -206,6 +206,11 @@ public class SwerveDrive implements Loggable
 		BLM.setAngle(0);
 	}
 	
+	public void setEncMax(SwerveModule module,double max)
+	{
+		module.setEncMax(max);
+	}
+	
 	public double[] calibrateAngle()
 	{
 		double[] max = new double[4];
