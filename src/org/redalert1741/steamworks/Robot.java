@@ -49,9 +49,9 @@ public class Robot extends IterativeRobot
 	private double x;
 	private double y;
 	private double twist;
-	private double autoAimOffset;
+//	private double autoAimOffset;
 	private boolean fieldOrient = true;
-	private boolean configReload;
+//	private boolean configReload;
 	
 	@Override
 	public void robotInit()
