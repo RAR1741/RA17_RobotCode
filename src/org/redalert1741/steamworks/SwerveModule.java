@@ -29,7 +29,7 @@ public class SwerveModule implements Loggable
 		SteerP = Config.getSetting("steerP",2);
 		SteerI = Config.getSetting("steerI",0);
 		SteerD = Config.getSetting("steerD",0);
-		SteerTolerance = Config.getSetting("Steering%Tolerance", .25);
+		SteerTolerance = Config.getSetting("SteeringTolerance", .25);
 		SteerSpeed = Config.getSetting("SteerSpeed", 1);
 		SteerEncMax = Config.getSetting("SteerEncMax",4.792);
 		SteerOffset = Config.getSetting("SteerEncOffset",0);
@@ -82,6 +82,12 @@ public class SwerveModule implements Loggable
 		return encFake.pidGet();
 	}
 	
+	public void setEncMax(double max)
+	{
+		encFake.setMinMax(0, max);
+		PIDc.setInputRange(0, max);
+	}
+	
 	public double getEncMax()
 	{
 		return SteerEncMax;
@@ -100,16 +106,30 @@ public class SwerveModule implements Loggable
 	public double calibrateAngle() 
 	{
 		double max = 0;
-		double tmp = 0;
 		Timer t = new Timer();
 		t.reset();
 		t.start();
 		angle.changeControlMode(TalonControlMode.PercentVbus);
-		
+		PIDSet();
+		PIDc.setSetpoint(0);
 		while(t.get() <= 5)
 		{
-			angle.set(tmp);
-			tmp+=0.01;
+			if(encoder.getVoltage() > 0.25 && encoder.getVoltage() < 0.75)
+			{
+				encFake.pidSetAbsolute(encoder.pidGet());
+				PIDc.setSetpoint(4.6);
+			}
+			else if(encoder.getVoltage() < 4.8 && encoder.getVoltage() > 4.5)
+			{
+				encFake.pidSetAbsolute(encoder.pidGet());
+				PIDc.setSetpoint(0.35);
+			}
+			else if(encoder.getVoltage() < 4.5 && encoder.getVoltage() > .75)
+			{
+				encFake.pidSetAbsolute(encoder.pidGet());
+				PIDc.setSetpoint(0);
+			}
+			
 			if(encoder.getVoltage() > max)
 			{
 				max = encoder.getVoltage();
@@ -150,19 +170,25 @@ public class SwerveModule implements Loggable
 	public void ReloadConfig(String s)
 	{
 	/////////////////////////////////////////////////////
-		SteerP = Config.getSetting("steerP",2);
-		SteerI = Config.getSetting("steerI",0);
-		SteerD = Config.getSetting("steerD",0);
+		SteerP = Config.getSetting("steerP"+s,2);
+		SteerI = Config.getSetting("steerI"+s,0);
+		SteerD = Config.getSetting("steerD"+s,0);
 		PIDc.setPID(SteerP,SteerI,SteerD);
 	///////////////////////////////////////////////////////////////////
-		SteerTolerance = Config.getSetting("Steering%Tolerance", 0.25);
+		SteerTolerance = Config.getSetting("SteeringTolerance", 0.25);
 		SteerSpeed = Config.getSetting("SteerSpeed", 1);
 		SteerEncMax = Config.getSetting("SteerEncMax" + s,4.792);
 		PIDc.setInputRange(0,SteerEncMax);
+		encFake.setMinMax(0, SteerEncMax);
 		PIDc.setOutputRange(-SteerSpeed,SteerSpeed);
 		PIDc.setPercentTolerance(SteerTolerance);
 	/////////////////////////////////////////////////////
 		SteerOffset = Config.getSetting("SteerEncOffset" + s,0);
 		encFake.setOffset(SteerOffset);
+	}
+	
+	public double getDriveEnc()
+	{
+		return drive.getEncPosition();
 	}
 }

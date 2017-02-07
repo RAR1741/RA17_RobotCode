@@ -183,10 +183,7 @@ public class SwerveDrive implements Loggable
 		FLM.setDrive(-ws1);
 		BRM.setDrive(ws3);
 		BLM.setDrive(-ws4);
-		System.out.println(wa1);
-		System.out.println(wa2);
-		System.out.println(wa3);
-		System.out.println(wa4);
+
 		FRM.setAngle(wa2);
 		FLM.setAngle(wa1);
 		BRM.setAngle(wa3);
@@ -207,6 +204,11 @@ public class SwerveDrive implements Loggable
 		FLM.setAngle(0);
 		BRM.setAngle(0);
 		BLM.setAngle(0);
+	}
+	
+	public void setEncMax(SwerveModule module,double max)
+	{
+		module.setEncMax(max);
 	}
 	
 	public double[] calibrateAngle()

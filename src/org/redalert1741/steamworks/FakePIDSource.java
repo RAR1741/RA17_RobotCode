@@ -67,6 +67,11 @@ public class FakePIDSource implements PIDSource
 		}
 	}
 	
+	public void pidSetAbsolute(double value) 
+	{
+		m_value = value;
+	}
+	
 	public double getSpeed()
 	{
 		return m_speed;
@@ -75,6 +80,11 @@ public class FakePIDSource implements PIDSource
 	public void setOffset(double offset)
 	{
 		m_offset = offset;
+	}
+	
+	public double getOffset()
+	{
+		return m_offset;
 	}
 	
 	public void setMinMax(double min, double max)
