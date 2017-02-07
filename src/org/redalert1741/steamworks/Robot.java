@@ -239,7 +239,7 @@ public class Robot extends IterativeRobot
 	void ReloadConfig()
 	{
 		Config.loadFromFile("/home/lvuser/config.txt");
-		autoAimOffset = Config.getSetting("autoAimOffest", 0);
+		//autoAimOffset = Config.getSetting("autoAimOffest", 0);
 		drive.ReloadConfig();
 	}
 }
