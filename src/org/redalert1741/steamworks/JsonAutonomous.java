@@ -105,6 +105,10 @@ public class JsonAutonomous extends Autonomous
 		}
 		else if(ai.type.equals("wait"))
 		{
+			if(timer.get() > (ai.unit.equals(Unit.Seconds)?ai.amount:ai.amount/1000.0))
+			{
+				reset();
+			}
 			System.out.println("Wait " + ai.amount + " " + ai.unit);
 		}
 	}
