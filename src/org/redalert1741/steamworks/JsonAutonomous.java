@@ -105,6 +105,7 @@ public class JsonAutonomous extends Autonomous
 		}
 		else if(ai.type.equals("wait"))
 		{
+			Robot.drive.swerveAbsolute(0, 0, 0, 0, false);
 			if(timer.get() > (ai.unit.equals(Unit.Seconds)?ai.amount:ai.amount/1000.0))
 			{
 				reset();
