@@ -13,9 +13,11 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 
+import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.Timer;
 
-public class JsonAutonomous extends Autonomous
+public class JsonAutonomous extends Autonomous implements PIDOutput
 {
 	private JsonElement auto;
 	private List<AutoInstruction> instructions;
@@ -23,6 +25,9 @@ public class JsonAutonomous extends Autonomous
 	private Timer timer;
 	private double start;
 	private double navxStart;
+	private PIDController turn;
+	private double turnSpeed;
+	private boolean edge;
 	private final double TICKS_PER_ROTATION = 133.4;
 	private final double TICKS_PER_INCH = TICKS_PER_ROTATION / (4 * Math.PI);
 	
@@ -45,6 +50,13 @@ public class JsonAutonomous extends Autonomous
 	
 	public JsonAutonomous(String file)
 	{
+		//TODO extract to config
+		turn = new PIDController(0.02, 0, 0, Robot.navx, this);
+		turn.setInputRange(-180, 180);
+		turn.setOutputRange(-0.7, 0.7);
+		turn.setAbsoluteTolerance(2);
+		turn.setContinuous(true);
+		
 		step = -1;
 		timer = new Timer();
 		instructions = new ArrayList<AutoInstruction>();
@@ -99,6 +111,10 @@ public class JsonAutonomous extends Autonomous
 		{
 			driveTranslation(ai);
 		}
+		else if(ai.type.equals("drive-r"))
+		{
+			driveRotation(ai);
+		}
 		else if(ai.type.equals("gear"))
 		{
 			gear(ai);
@@ -142,8 +158,10 @@ public class JsonAutonomous extends Autonomous
 	
 	private boolean rotateDegrees(double speed, double amt)
 	{
-		if(amt < Robot.navx.getAngle()-navxStart) { return true; }
-		Robot.drive.swerveAbsolute(0, 0, speed, Robot.navx.getAngle(), false);
+		turnSpeed = turn.get();
+		System.out.println(turnSpeed);
+		if(Math.abs(turnSpeed) < 0.01 && turnSpeed != 0) { return true; }
+		Robot.drive.swerveAbsolute(0, 0, -turnSpeed, Robot.navx.getAngle(), false);
 		return false;
 	}
 	
@@ -157,6 +175,7 @@ public class JsonAutonomous extends Autonomous
 		timer.start();
 		start = Robot.drive.FRM.getDriveEnc();
 		navxStart = Robot.navx.getAngle();
+		edge = true;
 	}
 	
 	/**
@@ -177,10 +196,18 @@ public class JsonAutonomous extends Autonomous
 	
 	public void driveRotation(AutoInstruction ai)
 	{
+		turn.enable();
+		if(edge)
+		{
+			System.out.println("setpoint " + Robot.navx.getAngle()+ai.amount);
+			turn.setSetpoint(Robot.navx.getAngle()+ai.amount);
+			edge = false;
+		}
 		System.out.println("Drive Rotation: a: " + ai.args.get(0) + ", " + ai.amount + " " + ai.unit);
 		if(rotateDegrees(ai.args.get(0), ai.unit.equals(Unit.Degrees) ? ai.amount : ai.amount*360.0))
 		{
 			reset();
+			turn.disable();
 		}
 	}
 	
@@ -213,6 +240,12 @@ public class JsonAutonomous extends Autonomous
 				reset();
 			}
 		}
+	}
+
+	@Override
+	public void pidWrite(double output)
+	{
+		turnSpeed = output;
 	}
 
 }
