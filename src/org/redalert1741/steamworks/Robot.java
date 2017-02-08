@@ -18,6 +18,7 @@ public class Robot extends IterativeRobot
 	private static LoggableNavX navx;
 	private static DataLogger logger;
 	private static Timer timer;
+	private static PowerDistributionPanel pdp;
 	@SuppressWarnings("unused")
 	private String auto = "";
 	
@@ -58,6 +59,7 @@ public class Robot extends IterativeRobot
 	{
 		timer = new Timer();
 		logger = new DataLogger();
+		pdp = new PowerDistributionPanel();
 		Config.loadFromFile("/home/lvuser/config.txt");
 		////////////////////////////////////////////////
 		try
@@ -223,6 +225,8 @@ public class Robot extends IterativeRobot
 	void setupLogging()
 	{
 		logger.addAttribute("Time");
+		logger.addAttribute("ClimberA1");
+		logger.addAttribute("ClimberA2");
 		logger.addLoggable(drive);
 		logger.addLoggable(navx);
 		logger.setupLoggables();
@@ -232,6 +236,8 @@ public class Robot extends IterativeRobot
 	void log(double time)
 	{
 		logger.log("Time", time);
+		logger.log("ClimberA1", pdp.getCurrent(15));
+		logger.log("ClimberA2", pdp.getCurrent(14));
 		logger.log();
 		logger.writeLine();
 	}
