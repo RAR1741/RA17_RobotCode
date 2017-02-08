@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.SPI.Port;
 
 public class Robot extends IterativeRobot
 {
-	private static LoggableNavX navx;
+	public static LoggableNavX navx;
 	private static DataLogger logger;
 	private static Timer timer;
 	private static PowerDistributionPanel pdp;
