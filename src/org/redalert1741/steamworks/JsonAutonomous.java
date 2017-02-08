@@ -50,6 +50,7 @@ public class JsonAutonomous extends Autonomous
 		instructions = new ArrayList<AutoInstruction>();
 		try
 		{
+			System.out.println(new File(file).exists());
 			auto = new JsonParser().parse(new JsonReader(new FileReader(new File(file))));
 			JsonElement inner = auto.getAsJsonObject().get("auto");
 			if(inner.isJsonArray())
@@ -80,14 +81,24 @@ public class JsonAutonomous extends Autonomous
 	@Override
 	public void run()
 	{
+		
 		if(step == -1)
 		{
 			reset();
+		}
+		if(instructions.size() == step)
+		{
+			Robot.drive.swerveAbsolute(0, 0, 0, 0, false);
+			return;
 		}
 		AutoInstruction ai = instructions.get(step);
 		if(ai.type.equals("drive"))
 		{
 			drive(ai);
+		}
+		else if(ai.type.equals("drive-t"))
+		{
+			driveTranslation(ai);
 		}
 		else if(ai.type.equals("gear"))
 		{
@@ -156,6 +167,7 @@ public class JsonAutonomous extends Autonomous
 	public void driveTranslation(AutoInstruction ai)
 	{
 		System.out.println("Drive Translation: x: " + ai.args.get(0) + ", y: " + ai.args.get(1));
+		ai.args.add(0.0);
 		drive(ai);
 	}
 	
