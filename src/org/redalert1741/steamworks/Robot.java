@@ -18,6 +18,7 @@ public class Robot extends IterativeRobot
 	private static LoggableNavX navx;
 	private static DataLogger logger;
 	private static Timer timer;
+	private static PowerDistributionPanel pdp;
 	@SuppressWarnings("unused")
 	private String auto = "";
 	
@@ -49,15 +50,16 @@ public class Robot extends IterativeRobot
 	private double x;
 	private double y;
 	private double twist;
-	private double autoAimOffset;
+//	private double autoAimOffset;
 	private boolean fieldOrient = true;
-	private boolean configReload;
+//	private boolean configReload;
 	
 	@Override
 	public void robotInit()
 	{
 		timer = new Timer();
 		logger = new DataLogger();
+		pdp = new PowerDistributionPanel();
 		Config.loadFromFile("/home/lvuser/config.txt");
 		////////////////////////////////////////////////
 		try
@@ -223,6 +225,8 @@ public class Robot extends IterativeRobot
 	void setupLogging()
 	{
 		logger.addAttribute("Time");
+		logger.addAttribute("ClimberA1");
+		logger.addAttribute("ClimberA2");
 		logger.addLoggable(drive);
 		logger.addLoggable(navx);
 		logger.setupLoggables();
@@ -232,6 +236,8 @@ public class Robot extends IterativeRobot
 	void log(double time)
 	{
 		logger.log("Time", time);
+		logger.log("ClimberA1", pdp.getCurrent(15));
+		logger.log("ClimberA2", pdp.getCurrent(14));
 		logger.log();
 		logger.writeLine();
 	}
@@ -239,7 +245,7 @@ public class Robot extends IterativeRobot
 	void ReloadConfig()
 	{
 		Config.loadFromFile("/home/lvuser/config.txt");
-		autoAimOffset = Config.getSetting("autoAimOffest", 0);
+		//autoAimOffset = Config.getSetting("autoAimOffest", 0);
 		drive.ReloadConfig();
 	}
 }
