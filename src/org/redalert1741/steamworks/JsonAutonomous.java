@@ -81,7 +81,6 @@ public class JsonAutonomous extends Autonomous
 	@Override
 	public void run()
 	{
-		
 		if(step == -1)
 		{
 			reset();
