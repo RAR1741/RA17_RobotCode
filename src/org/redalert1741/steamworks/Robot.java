@@ -19,6 +19,8 @@ public class Robot extends IterativeRobot
 	private static DataLogger logger;
 	private static Timer timer;
 	private static PowerDistributionPanel pdp;
+	private static Solenoid redLED;
+	private static Solenoid whiteLED;
 	@SuppressWarnings("unused")
 	private String auto = "";
 	
@@ -60,7 +62,9 @@ public class Robot extends IterativeRobot
 	{
 		timer = new Timer();
 		logger = new DataLogger();
-		pdp = new PowerDistributionPanel();
+		pdp = new PowerDistributionPanel(20);
+		redLED = new Solenoid(0);
+		whiteLED = new Solenoid(1);
 		Config.loadFromFile("/home/lvuser/config.txt");
 		////////////////////////////////////////////////
 		try
@@ -135,6 +139,8 @@ public class Robot extends IterativeRobot
 	@Override
 	public void teleopPeriodic()
 	{
+		redLED.set(true);
+		whiteLED.set(true);
     	///////////////////////////////////////////////////////////////////////////
     	//Utility
     	log(timer.get());
