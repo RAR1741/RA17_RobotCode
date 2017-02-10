@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.SPI.Port;
 
 public class Robot extends IterativeRobot
 {
-	private static LoggableNavX navx;
+	public static LoggableNavX navx;
 	private static DataLogger logger;
 	private static Timer timer;
 	private static PowerDistributionPanel pdp;
@@ -53,6 +53,7 @@ public class Robot extends IterativeRobot
 //	private double autoAimOffset;
 	private boolean fieldOrient = true;
 //	private boolean configReload;
+	private JsonAutonomous auton;
 	
 	@Override
 	public void robotInit()
@@ -108,20 +109,22 @@ public class Robot extends IterativeRobot
 	{
 		setupPeriodic("auto");
 		drive.angleToZero();
+		auton = new JsonAutonomous("/home/lvuser/auto-test.json");
 	}
 
 	@Override
 	public void autonomousPeriodic()
 	{
-    	log(timer.get());
-		if(timer.get() >= 1 && timer.get() <= 5)
-		{
-			drive.swerveAbsolute(0, -.4, 0, 0, false);
-		}
-		else
-		{
-			drive.swerveAbsolute(0, -.001, 0, 0, false);
-		}
+//    	log(timer.get());
+//		if(timer.get() >= 1 && timer.get() <= 5)
+//		{
+//			drive.swerveAbsolute(0, -.4, 0, 0, false);
+//		}
+//		else
+//		{
+//			drive.swerveAbsolute(0, -.001, 0, 0, false);
+//		}
+		auton.run();
 	}
 //========================================================================================================
 	@Override
