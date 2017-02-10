@@ -59,7 +59,7 @@ public class Robot extends IterativeRobot
 	{
 		timer = new Timer();
 		logger = new DataLogger();
-		pdp = new PowerDistributionPanel();
+		pdp = new PowerDistributionPanel(20);
 		Config.loadFromFile("/home/lvuser/config.txt");
 		////////////////////////////////////////////////
 		try
