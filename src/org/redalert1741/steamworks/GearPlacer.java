@@ -18,6 +18,7 @@ public class GearPlacer implements Loggable,Configurable
 	
 	public GearPlacer(int m)
 	{
+		state = GearPlacerState.Waiting;
 		M = new Spark(m);
 		motorSpeed = Config.getSetting("gearMotorSpeed", 0.3);
 	}
