@@ -58,7 +58,6 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	 */
 	public JsonAutonomous(String file)
 	{
-		//TODO extract to config
 		turn = new PIDController(0.02, 0, 0, Robot.navx, this);
 		turn.setInputRange(-180, 180);
 		turn.setOutputRange(-0.7, 0.7);
