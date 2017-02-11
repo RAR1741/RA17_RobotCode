@@ -62,7 +62,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 		turn.setAbsoluteTolerance(0.5);
 		turn.setContinuous(true);
 		
-		straighten = new PIDController(0.001, 0, 0, Robot.navx, this);
+		straighten = new PIDController(0.01, 0, 0, Robot.navx, this);
 		straighten.setInputRange(-180, 180);
 		straighten.setOutputRange(-0.7, 0.7);
 		straighten.setAbsoluteTolerance(0);

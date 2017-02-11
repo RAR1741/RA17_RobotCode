@@ -26,6 +26,7 @@ public class Robot extends IterativeRobot
 	
 	public static SwerveDrive drive;
 	public static Climber climber;
+	public static GearPlacer gear;
 	
 	private static XboxController driver;
 	private static EdgeDetect driveMode;
@@ -101,6 +102,8 @@ public class Robot extends IterativeRobot
 		driveAimer.setOutputRange(-.3,.3);
 		driveAimer.setAbsoluteTolerance(.5);
 		climber = new Climber(0, 1);
+		////////////////////////////////////////////////
+		gear = new GearPlacer(2);
 		ReloadConfig();
 	}
 //========================================================================================================
@@ -170,6 +173,20 @@ public class Robot extends IterativeRobot
     	{
     		climber.climb(0);
     	}
+    	///////////////////////////////////////////////////////////////////////////
+    	//Gear
+    	if(driver.getBumper(Hand.kLeft))
+    	{
+    		gear.close();
+    	}
+    	else if(driver.getBumper(Hand.kRight))
+    	{
+    		gear.open();
+    	}
+    	else
+    	{
+    		gear.stop();
+    	}
 	}
 //========================================================================================================
 	@Override
@@ -232,6 +249,7 @@ public class Robot extends IterativeRobot
 		logger.addAttribute("ClimberA2");
 		logger.addLoggable(drive);
 		logger.addLoggable(navx);
+		logger.addLoggable(gear);
 		logger.setupLoggables();
 		logger.writeAttributes();
 	}

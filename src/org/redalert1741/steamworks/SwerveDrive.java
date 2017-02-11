@@ -131,10 +131,10 @@ public class SwerveDrive implements Loggable
 				FLM.PIDSet();
 				BRM.PIDSet();
 				BLM.PIDSet();
-				FRM.setDrive(0);
-				FLM.setDrive(0);
-				BRM.setDrive(0);
-				BLM.setDrive(0);
+				FRM.setDriveSpeed(0);
+				FLM.setDriveSpeed(0);
+				BRM.setDriveSpeed(0);
+				BLM.setDriveSpeed(0);
 			}
 		}
 	}
