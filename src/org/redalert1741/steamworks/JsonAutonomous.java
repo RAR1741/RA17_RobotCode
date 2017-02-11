@@ -26,9 +26,10 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 	private double start;
 	private double navxStart;
 	private PIDController turn;
+	private PIDController straighten;
 	private double turnSpeed;
 	private boolean edge;
-	private final double TICKS_PER_ROTATION = 133.4;
+	private final double TICKS_PER_ROTATION = 533.4;
 	private final double TICKS_PER_INCH = TICKS_PER_ROTATION / (4 * Math.PI);
 	
 	private enum Unit { Seconds, Milliseconds, EncoderTicks, Rotations, Inches, Feet, Degrees, Invalid };
@@ -54,15 +55,21 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 		turn = new PIDController(0.02, 0, 0, Robot.navx, this);
 		turn.setInputRange(-180, 180);
 		turn.setOutputRange(-0.7, 0.7);
-		turn.setAbsoluteTolerance(2);
+		turn.setAbsoluteTolerance(0.5);
 		turn.setContinuous(true);
+		
+		straighten = new PIDController(0.001, 0, 0, Robot.navx, this);
+		straighten.setInputRange(-180, 180);
+		straighten.setOutputRange(-0.7, 0.7);
+		straighten.setAbsoluteTolerance(0);
+		straighten.setContinuous(true);
 		
 		step = -1;
 		timer = new Timer();
 		instructions = new ArrayList<AutoInstruction>();
 		try
 		{
-			System.out.println(new File(file).exists());
+			//System.out.println(new File(file).exists());
 			auto = new JsonParser().parse(new JsonReader(new FileReader(new File(file))));
 			JsonElement inner = auto.getAsJsonObject().get("auto");
 			if(inner.isJsonArray())
@@ -126,7 +133,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 			{
 				reset();
 			}
-			System.out.println("Wait " + ai.amount + " " + ai.unit);
+			//System.out.println("Wait " + ai.amount + " " + ai.unit);
 		}
 	}
 	
@@ -134,7 +141,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 	{
 		if(timer.get() < t)
 		{
-			Robot.drive.swerveAbsolute(x, y, z, 0, false);
+			Robot.drive.swerveAbsolute(x, y, z, Robot.navx.getAngle()-navxStart, false);
 		}
 		else
 		{
@@ -147,7 +154,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 	{
 		if(Robot.drive.FRM.getDriveEnc()-start < a)
 		{
-			Robot.drive.swerveAbsolute(x, y, z, 0, false);
+			Robot.drive.swerveAbsolute(x, y, z, -(Robot.navx.getAngle()-navxStart), false);
 		}
 		else
 		{
@@ -159,7 +166,6 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 	private boolean rotateDegrees(double speed, double amt)
 	{
 		turnSpeed = turn.get();
-		System.out.println(turnSpeed);
 		if(Math.abs(turnSpeed) < 0.01 && turnSpeed != 0) { return true; }
 		Robot.drive.swerveAbsolute(0, 0, -turnSpeed, Robot.navx.getAngle(), false);
 		return false;
@@ -170,6 +176,8 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 	 */
 	private void reset()
 	{
+		turn.disable();
+		straighten.disable();
 		step++;
 		timer.reset();
 		timer.start();
@@ -184,13 +192,26 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 	 */
 	public void gear(AutoInstruction ai)
 	{
-		System.out.println("Gear " + (ai.args.get(0)==1?"open":"close"));
+		//System.out.println("Gear " + (ai.args.get(0)==1?"open":"close"));
 	}
 	
 	public void driveTranslation(AutoInstruction ai)
 	{
-		System.out.println("Drive Translation: x: " + ai.args.get(0) + ", y: " + ai.args.get(1));
-		ai.args.add(0.0);
+		//System.out.println("Drive Translation: x: " + ai.args.get(0) + ", y: " + ai.args.get(1));
+		if(edge)
+		{
+			straighten.enable();
+			straighten.setSetpoint(Robot.navx.getAngle());
+			edge=false;
+		}
+		if(ai.args.size() == 3)
+		{
+			ai.args.set(2, -straighten.get());
+		}
+		else
+		{
+			ai.args.add(-straighten.get());
+		}
 		drive(ai);
 	}
 	
@@ -199,11 +220,11 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 		turn.enable();
 		if(edge)
 		{
-			System.out.println("setpoint " + Robot.navx.getAngle()+ai.amount);
+			//System.out.println("setpoint " + Robot.navx.getAngle()+ai.amount);
 			turn.setSetpoint(Robot.navx.getAngle()+ai.amount);
 			edge = false;
 		}
-		System.out.println("Drive Rotation: a: " + ai.args.get(0) + ", " + ai.amount + " " + ai.unit);
+		//System.out.println("Drive Rotation: a: " + ai.args.get(0) + ", " + ai.amount + " " + ai.unit);
 		if(rotateDegrees(ai.args.get(0), ai.unit.equals(Unit.Degrees) ? ai.amount : ai.amount*360.0))
 		{
 			reset();
@@ -217,7 +238,8 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 	 */
 	public void drive(AutoInstruction ai)
 	{
-		System.out.println("Drive x: " + ai.args.get(0) + ", y: " + ai.args.get(1) + ", z: " + ai.args.get(2) + ", " + ai.amount + " " + ai.unit);
+		//System.out.println("Drive x: " + ai.args.get(0) + ", y: " + ai.args.get(1) + ", z: " + ai.args.get(2) + ", " + ai.amount + " " + ai.unit);
+		System.out.println(ai.args.get(2));
 		Unit u = ai.unit;
 		if(u.equals(Unit.Seconds) || u.equals(Unit.Milliseconds))
 		{
@@ -228,14 +250,15 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 		}
 		else if(u.equals(Unit.EncoderTicks) || u.equals(Unit.Rotations))
 		{
-			if(driveDistance(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.EncoderTicks) ? ai.amount : ai.amount/TICKS_PER_ROTATION)))
+			if(driveDistance(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.EncoderTicks) ? ai.amount : ai.amount*TICKS_PER_ROTATION)))
 			{
 				reset();
 			}
 		}
 		else if(u.equals(Unit.Feet) || u.equals(Unit.Inches))
 		{
-			if(driveDistance(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.Inches) ? ai.amount/TICKS_PER_INCH : (ai.amount/TICKS_PER_INCH))/12.0))
+			
+			if(driveDistance(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.Inches) ? ai.amount*TICKS_PER_INCH : (ai.amount*TICKS_PER_INCH))*12.0))
 			{
 				reset();
 			}

@@ -91,7 +91,7 @@ public class SwerveModule implements Loggable
 	{
 		drive.changeControlMode(TalonControlMode.Speed);
 		drive.set(speed*MaxRPM);
-		System.out.println(drive.getSetpoint());
+		//System.out.println(drive.getSetpoint());
 	}
 	
 	public double pidGet()
