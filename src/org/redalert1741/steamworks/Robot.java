@@ -55,6 +55,7 @@ public class Robot extends IterativeRobot
 	private boolean fieldOrient = true;
 //	private boolean configReload;
 	private JsonAutonomous auton;
+	private ScopeToggler scopeToggler;
 	
 	@Override
 	public void robotInit()
@@ -62,6 +63,7 @@ public class Robot extends IterativeRobot
 		timer = new Timer();
 		logger = new DataLogger();
 		pdp = new PowerDistributionPanel(20);
+		scopeToggler = new ScopeToggler(0,1);
 		Config.loadFromFile("/home/lvuser/config.txt");
 		////////////////////////////////////////////////
 		try
@@ -140,6 +142,7 @@ public class Robot extends IterativeRobot
 	{
     	///////////////////////////////////////////////////////////////////////////
     	//Utility
+		scopeToggler.startLoop(); // Must be first line in periodic
     	log(timer.get());
     	if(driver.getBackButton())
     	{
@@ -187,6 +190,7 @@ public class Robot extends IterativeRobot
     	{
     		gear.stop();
     	}
+    	scopeToggler.endLoop();
 	}
 //========================================================================================================
 	@Override
