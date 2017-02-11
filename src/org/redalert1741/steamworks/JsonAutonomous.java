@@ -6,6 +6,9 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.redalert1741.robotBase.config.Config;
+import org.redalert1741.robotBase.config.Configurable;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
@@ -17,7 +20,7 @@ import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.Timer;
 
-public class JsonAutonomous extends Autonomous implements PIDOutput
+public class JsonAutonomous extends Autonomous implements PIDOutput, Configurable
 {
 	private JsonElement auto;
 	private List<AutoInstruction> instructions;
@@ -55,7 +58,6 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 	 */
 	public JsonAutonomous(String file)
 	{
-		//TODO extract to config
 		turn = new PIDController(0.02, 0, 0, Robot.navx, this);
 		turn.setInputRange(-180, 180);
 		turn.setOutputRange(-0.7, 0.7);
@@ -67,6 +69,8 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 		straighten.setOutputRange(-0.7, 0.7);
 		straighten.setAbsoluteTolerance(0);
 		straighten.setContinuous(true);
+		
+		reloadConfig();
 		
 		step = -1;
 		timer = new Timer();
@@ -297,6 +301,17 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 	public void pidWrite(double output)
 	{
 		turnSpeed = output;
+	}
+
+	@Override
+	public void reloadConfig()
+	{
+		turn.setPID(Config.getSetting("auto_turn_p", 0.2), 
+				Config.getSetting("auto_turn_i", 0),
+				Config.getSetting("auto_turn_d", 0));
+		straighten.setPID(Config.getSetting("auto_straight_p", 0.2), 
+				Config.getSetting("auto_straight_i", 0),
+				Config.getSetting("auto_straight_d", 0));
 	}
 
 }
