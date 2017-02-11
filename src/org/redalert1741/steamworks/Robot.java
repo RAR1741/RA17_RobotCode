@@ -151,12 +151,12 @@ public class Robot extends IterativeRobot
     	y = driver.getY(Hand.kLeft);
     	twist = driver.getX(Hand.kRight);
     	
-    	if(x >= -0.1 && x <= 0.1){x=0;}
-    	else if(!driver.getBumper(Hand.kRight)) { x=0.6*x; }
-    	if(y >= -0.1 && y <= 0.1){y=0;}
-    	else if(!driver.getBumper(Hand.kRight)) { y=0.6*y; }
-    	if(twist >= -0.1 && twist <= 0.1){twist=0;}
-    	else if(!driver.getBumper(Hand.kRight)) { twist=0.6*twist; }
+    	if(x >= -0.025 && x <= 0.025){x=0;}
+    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { x=0.5*x; }
+    	if(y >= -0.025 && y <= 0.025){y=0;}
+    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { y=0.5*y; }
+    	if(twist >= -0.025 && twist <= 0.025){twist=0;}
+    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { twist=0.5*twist; }
     	else { twist=0.8*twist; }
     	if(driveMode.Check(driver.getStartButton()))
     	{
