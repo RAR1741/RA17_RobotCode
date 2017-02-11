@@ -16,10 +16,11 @@ public class GearPlacer implements Loggable,Configurable
 	double motorSpeed;
 
 	
-	public GearPlacer(Spark m)
+	public GearPlacer(int m)
 	{
-		M = m;
-		motorSpeed = Config.getSetting("gearMotorSpeed", 0.5);
+		state = GearPlacerState.Waiting;
+		M = new Spark(m);
+		motorSpeed = Config.getSetting("gearMotorSpeed", 0.3);
 	}
 	
 	public enum GearPlacerState
@@ -108,6 +109,6 @@ public class GearPlacer implements Loggable,Configurable
 	@Override
 	public void reloadConfig() 
 	{
-		Config.getSetting("gearMotorSpeed", 0.5);
+		Config.getSetting("gearMotorSpeed", 0.3);
 	}
 }

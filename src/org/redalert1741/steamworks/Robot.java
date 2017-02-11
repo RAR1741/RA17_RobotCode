@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.SPI.Port;
 
 public class Robot extends IterativeRobot
 {
-	private static LoggableNavX navx;
+	public static LoggableNavX navx;
 	private static DataLogger logger;
 	private static Timer timer;
 	private static PowerDistributionPanel pdp;
@@ -26,6 +26,7 @@ public class Robot extends IterativeRobot
 	
 	public static SwerveDrive drive;
 	public static Climber climber;
+	public static GearPlacer gear;
 	
 	private static XboxController driver;
 	private static EdgeDetect driveMode;
@@ -53,13 +54,14 @@ public class Robot extends IterativeRobot
 //	private double autoAimOffset;
 	private boolean fieldOrient = true;
 //	private boolean configReload;
+	private JsonAutonomous auton;
 	
 	@Override
 	public void robotInit()
 	{
 		timer = new Timer();
 		logger = new DataLogger();
-		pdp = new PowerDistributionPanel();
+		pdp = new PowerDistributionPanel(20);
 		Config.loadFromFile("/home/lvuser/config.txt");
 		////////////////////////////////////////////////
 		try
@@ -100,6 +102,8 @@ public class Robot extends IterativeRobot
 		driveAimer.setOutputRange(-.3,.3);
 		driveAimer.setAbsoluteTolerance(.5);
 		climber = new Climber(0, 1);
+		////////////////////////////////////////////////
+		gear = new GearPlacer(2);
 		ReloadConfig();
 	}
 //========================================================================================================
@@ -108,20 +112,22 @@ public class Robot extends IterativeRobot
 	{
 		setupPeriodic("auto");
 		drive.angleToZero();
+		auton = new JsonAutonomous("/home/lvuser/auto-test.json");
 	}
 
 	@Override
 	public void autonomousPeriodic()
 	{
-    	log(timer.get());
-		if(timer.get() >= 1 && timer.get() <= 5)
-		{
-			drive.swerveAbsolute(0, -.4, 0, 0, false);
-		}
-		else
-		{
-			drive.swerveAbsolute(0, -.001, 0, 0, false);
-		}
+//    	log(timer.get());
+//		if(timer.get() >= 1 && timer.get() <= 5)
+//		{
+//			drive.swerveAbsolute(0, -.4, 0, 0, false);
+//		}
+//		else
+//		{
+//			drive.swerveAbsolute(0, -.001, 0, 0, false);
+//		}
+		auton.run();
 	}
 //========================================================================================================
 	@Override
@@ -145,12 +151,12 @@ public class Robot extends IterativeRobot
     	y = driver.getY(Hand.kLeft);
     	twist = driver.getX(Hand.kRight);
     	
-    	if(x >= -0.1 && x <= 0.1){x=0;}
-    	else if(!driver.getBumper(Hand.kRight)) { x=0.6*x; }
-    	if(y >= -0.1 && y <= 0.1){y=0;}
-    	else if(!driver.getBumper(Hand.kRight)) { y=0.6*y; }
-    	if(twist >= -0.1 && twist <= 0.1){twist=0;}
-    	else if(!driver.getBumper(Hand.kRight)) { twist=0.6*twist; }
+    	if(x >= -0.05 && x <= 0.05){x=0;}
+    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { x=0.5*x; }
+    	if(y >= -0.05 && y <= 0.05){y=0;}
+    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { y=0.5*y; }
+    	if(twist >= -0.05 && twist <= 0.05){twist=0;}
+    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { twist=0.5*twist; }
     	else { twist=0.8*twist; }
     	if(driveMode.Check(driver.getStartButton()))
     	{
@@ -166,6 +172,20 @@ public class Robot extends IterativeRobot
     	else
     	{
     		climber.climb(0);
+    	}
+    	///////////////////////////////////////////////////////////////////////////
+    	//Gear
+    	if(driver.getBumper(Hand.kLeft))
+    	{
+    		gear.close();
+    	}
+    	else if(driver.getBumper(Hand.kRight))
+    	{
+    		gear.open();
+    	}
+    	else
+    	{
+    		gear.stop();
     	}
 	}
 //========================================================================================================
@@ -229,6 +249,7 @@ public class Robot extends IterativeRobot
 		logger.addAttribute("ClimberA2");
 		logger.addLoggable(drive);
 		logger.addLoggable(navx);
+		logger.addLoggable(gear);
 		logger.setupLoggables();
 		logger.writeAttributes();
 	}

@@ -108,10 +108,10 @@ public class SwerveDrive implements Loggable
 				ws4 = -ws4;
 			}
 			
-			FRM.setDrive(ws2);
-			FLM.setDrive(-ws1);
-			BRM.setDrive(ws3);
-			BLM.setDrive(-ws4);
+			FRM.setDriveSpeed(ws2);
+			FLM.setDriveSpeed(-ws1);
+			BRM.setDriveSpeed(ws3);
+			BLM.setDriveSpeed(-ws4);
 			
 			FRM.setAngle(wa2);
 			FLM.setAngle(wa1);
@@ -131,10 +131,10 @@ public class SwerveDrive implements Loggable
 				FLM.PIDSet();
 				BRM.PIDSet();
 				BLM.PIDSet();
-				FRM.setDrive(0);
-				FLM.setDrive(0);
-				BRM.setDrive(0);
-				BLM.setDrive(0);
+				FRM.setDriveSpeed(0);
+				FLM.setDriveSpeed(0);
+				BRM.setDriveSpeed(0);
+				BLM.setDriveSpeed(0);
 			}
 		}
 	}
@@ -179,10 +179,10 @@ public class SwerveDrive implements Loggable
 		BRM.PIDSet();
 		BLM.PIDSet();
 		
-		FRM.setDrive(ws2);
-		FLM.setDrive(-ws1);
-		BRM.setDrive(ws3);
-		BLM.setDrive(-ws4);
+		FRM.setDriveSpeed(ws2);
+		FLM.setDriveSpeed(-ws1);
+		BRM.setDriveSpeed(ws3);
+		BLM.setDriveSpeed(-ws4);
 
 		FRM.setAngle(wa2);
 		FLM.setAngle(wa1);

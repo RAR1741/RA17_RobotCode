@@ -1,0 +1,10 @@
+{
+	"auto":[
+		{"type":"drive-t","unit":"Seconds","amount":1,"args":[1,1]},
+		{"type":"drive-t","unit":"Seconds","amount":1,"args":[0,0]},
+		{"type":"gear","unit":"Invalid","amount":0,"args":[1]},
+		{"type":"wait","unit":"Seconds","amount":3,"args":[]},
+		{"type":"gear","unit":"Invalid","amount":0,"args":[0]},
+		{"type":"drive-r","unit":"Feet","amount":3,"args":[0.5]}
+	]
+}
