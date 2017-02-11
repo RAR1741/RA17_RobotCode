@@ -49,6 +49,10 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 		}
 	}
 	
+	/**
+	 * Creates a JsonAutonomous from the specified file
+	 * @param file The location of the file to parse
+	 */
 	public JsonAutonomous(String file)
 	{
 		//TODO extract to config
@@ -137,6 +141,14 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 		}
 	}
 	
+	/**
+	 * Helper function for {@link #drive(AutoInstruction)}
+	 * @param x X translation speed
+	 * @param y Y translation speed
+	 * @param z Rotational speed
+	 * @param t Time to drive
+	 * @return Whether drive has completed
+	 */
 	private boolean driveTime(double x, double y, double z, double t)
 	{
 		if(timer.get() < t)
@@ -163,6 +175,12 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 		return false;
 	}
 	
+	/**
+	 * Helper function for {@link #driveRotation(AutoInstruction)}
+	 * @param speed Unused
+	 * @param amt Unused
+	 * @return Whether turn has completed
+	 */
 	private boolean rotateDegrees(double speed, double amt)
 	{
 		turnSpeed = turn.get();
@@ -172,7 +190,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 	}
 	
 	/**
-	 * Resets all of the variables used for a single step and increments the step counter
+	 * Resets all of the variables used for a single auto step and increments the step counter
 	 */
 	private void reset()
 	{
@@ -195,6 +213,11 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 		//System.out.println("Gear " + (ai.args.get(0)==1?"open":"close"));
 	}
 	
+	/**
+	 * Drives in a straight line while maintaining current rotation
+	 * @see AutoInstruction
+	 * @param ai AutoInstruction to use
+	 */
 	public void driveTranslation(AutoInstruction ai)
 	{
 		//System.out.println("Drive Translation: x: " + ai.args.get(0) + ", y: " + ai.args.get(1));
@@ -215,6 +238,11 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 		drive(ai);
 	}
 	
+	/**
+	 * Rotates the robot without moving translationally
+	 * @see AutoInstruction
+	 * @param ai Instruction to use
+	 */
 	public void driveRotation(AutoInstruction ai)
 	{
 		turn.enable();
@@ -233,7 +261,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput
 	}
 	
 	/**
-	 * Processes a three-arg drive instruction 
+	 * Processes a three-argument drive instruction 
 	 * @param ai
 	 */
 	public void drive(AutoInstruction ai)
