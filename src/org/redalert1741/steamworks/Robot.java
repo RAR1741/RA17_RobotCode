@@ -28,6 +28,7 @@ public class Robot extends IterativeRobot
 	
 	public static SwerveDrive drive;
 	public static Climber climber;
+	public static GearPlacer gear;
 	
 	private static XboxController driver;
 	private static EdgeDetect driveMode;
@@ -56,6 +57,7 @@ public class Robot extends IterativeRobot
 	private boolean fieldOrient = true;
 //	private boolean configReload;
 	private JsonAutonomous auton;
+	private ScopeToggler scopeToggler;
 	
 	@Override
 	public void robotInit()
@@ -65,6 +67,7 @@ public class Robot extends IterativeRobot
 		pdp = new PowerDistributionPanel(20);
 		redLED = new Solenoid(0);
 		whiteLED = new Solenoid(1);
+		scopeToggler = new ScopeToggler(0,1);
 		Config.loadFromFile("/home/lvuser/config.txt");
 		////////////////////////////////////////////////
 		try
@@ -80,14 +83,14 @@ public class Robot extends IterativeRobot
 		FLe = new AnalogInput(2);
 		BRe = new AnalogInput(3);
 		BLe = new AnalogInput(1);
-	   	FR = new CANTalon(1);
-    	FRa = new CANTalon(5);
-    	FL = new CANTalon(3);
-    	FLa = new CANTalon(7);
-    	BR = new CANTalon(4);
-    	BRa = new CANTalon(8);
-    	BL = new CANTalon(2);
-    	BLa = new CANTalon(6);
+	  FR = new CANTalon(1);
+    FRa = new CANTalon(5);
+    FL = new CANTalon(3);
+    FLa = new CANTalon(7);
+    BR = new CANTalon(4);
+    BRa = new CANTalon(8);
+    BL = new CANTalon(2);
+    BLa = new CANTalon(6);
 		drive = new SwerveDrive(FR, FRa, FRe, FL, FLa, FLe, BR, BRa, BRe, BL, BLa, BLe);
 		////////////////////////////////////////////////
 		driver = new XboxController(4);
@@ -105,6 +108,8 @@ public class Robot extends IterativeRobot
 		driveAimer.setOutputRange(-.3,.3);
 		driveAimer.setAbsoluteTolerance(.5);
 		climber = new Climber(0, 1);
+		////////////////////////////////////////////////
+		gear = new GearPlacer(2);
 		ReloadConfig();
 	}
 //========================================================================================================
@@ -143,6 +148,7 @@ public class Robot extends IterativeRobot
 		whiteLED.set(true);
     	///////////////////////////////////////////////////////////////////////////
     	//Utility
+		scopeToggler.startLoop(); // Must be first line in periodic
     	log(timer.get());
     	if(driver.getBackButton())
     	{
@@ -154,12 +160,12 @@ public class Robot extends IterativeRobot
     	y = driver.getY(Hand.kLeft);
     	twist = driver.getX(Hand.kRight);
     	
-    	if(x >= -0.1 && x <= 0.1){x=0;}
-    	else if(!driver.getBumper(Hand.kRight)) { x=0.6*x; }
-    	if(y >= -0.1 && y <= 0.1){y=0;}
-    	else if(!driver.getBumper(Hand.kRight)) { y=0.6*y; }
-    	if(twist >= -0.1 && twist <= 0.1){twist=0;}
-    	else if(!driver.getBumper(Hand.kRight)) { twist=0.6*twist; }
+    	if(x >= -0.05 && x <= 0.05){x=0;}
+    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { x=0.5*x; }
+    	if(y >= -0.05 && y <= 0.05){y=0;}
+    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { y=0.5*y; }
+    	if(twist >= -0.05 && twist <= 0.05){twist=0;}
+    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { twist=0.5*twist; }
     	else { twist=0.8*twist; }
     	if(driveMode.Check(driver.getStartButton()))
     	{
@@ -176,6 +182,21 @@ public class Robot extends IterativeRobot
     	{
     		climber.climb(0);
     	}
+    	///////////////////////////////////////////////////////////////////////////
+    	//Gear
+    	if(driver.getBumper(Hand.kLeft))
+    	{
+    		gear.close();
+    	}
+    	else if(driver.getBumper(Hand.kRight))
+    	{
+    		gear.open();
+    	}
+    	else
+    	{
+    		gear.stop();
+    	}
+    	scopeToggler.endLoop();
 	}
 //========================================================================================================
 	@Override
@@ -238,6 +259,7 @@ public class Robot extends IterativeRobot
 		logger.addAttribute("ClimberA2");
 		logger.addLoggable(drive);
 		logger.addLoggable(navx);
+		logger.addLoggable(gear);
 		logger.setupLoggables();
 		logger.writeAttributes();
 	}

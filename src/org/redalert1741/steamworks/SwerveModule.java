@@ -5,6 +5,7 @@ import org.redalert1741.robotBase.logging.DataLogger;
 import org.redalert1741.robotBase.logging.Loggable;
 
 import com.ctre.CANTalon;
+import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.AnalogInput;
@@ -14,8 +15,10 @@ import edu.wpi.first.wpilibj.Timer;
 public class SwerveModule implements Loggable
 {
 	private double SteerP,SteerI,SteerD;
+	private double SpeedP,SpeedI,SpeedD;
 	private double SteerSpeed,SteerTolerance,SteerEncMax;
 	private double SteerOffset;
+	private double MaxRPM;
 	
 	private CANTalon drive;
 	private CANTalon angle;
@@ -26,6 +29,9 @@ public class SwerveModule implements Loggable
 	
 	public SwerveModule(CANTalon d, CANTalon a, AnalogInput e, String name)
 	{
+		SpeedP = Config.getSetting("speedP",1);
+		SpeedI = Config.getSetting("speedI",0);
+		SpeedD = Config.getSetting("speedD",0);
 		SteerP = Config.getSetting("steerP",2);
 		SteerI = Config.getSetting("steerI",0);
 		SteerD = Config.getSetting("steerD",0);
@@ -33,12 +39,15 @@ public class SwerveModule implements Loggable
 		SteerSpeed = Config.getSetting("SteerSpeed", 1);
 		SteerEncMax = Config.getSetting("SteerEncMax",4.792);
 		SteerOffset = Config.getSetting("SteerEncOffset",0);
+		MaxRPM = Config.getSetting("driveCIMmaxRPM", 4200);
 		
 		drive = d;
-		drive.setControlMode(0);
+		drive.setPID(SpeedP, SpeedI, SpeedD);
+		drive.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+    	drive.configEncoderCodesPerRev(20);
+    	drive.enable();
 		
 		angle = a;
-		angle.setControlMode(0);
 		
 		encoder = e;
 		
@@ -52,7 +61,7 @@ public class SwerveModule implements Loggable
 		PIDc.setPercentTolerance(SteerTolerance);
 		PIDc.setSetpoint(2.4);
 		PIDc.enable();
-		s=name;
+		s = name;
 	}
 	
 	public void setAngleDrive(double speed, double angle)
@@ -74,7 +83,15 @@ public class SwerveModule implements Loggable
 	
 	public void setDrive(double speed)
 	{
+		drive.changeControlMode(TalonControlMode.PercentVbus);
 		drive.set(speed);
+	}
+	
+	public void setDriveSpeed(double speed)
+	{
+		drive.changeControlMode(TalonControlMode.Speed);
+		drive.set(speed*MaxRPM);
+		//System.out.println(drive.getSetpoint());
 	}
 	
 	public double pidGet()
@@ -146,6 +163,7 @@ public class SwerveModule implements Loggable
 		logger.addAttribute(s + "pos");
 		logger.addAttribute(s + "Current");
 		logger.addAttribute(s + "speed");
+		logger.addAttribute(s + "setpoint");
 		logger.addAttribute(s + "Apos");
 		logger.addAttribute(s + "ACurrent");
 		logger.addAttribute(s + "Encpos");
@@ -159,6 +177,7 @@ public class SwerveModule implements Loggable
 		logger.log(s + "pos", drive.getEncPosition());
 		logger.log(s + "Current", drive.getOutputCurrent());
 		logger.log(s + "speed", drive.getSpeed());
+		logger.log(s + "setpoint", drive.getSetpoint());
 		logger.log(s + "Apos", angle.getEncPosition());
 		logger.log(s + "ACurrent", angle.getOutputCurrent());
 		//logger.Log(s + "Encpos", encoder.getVoltage() + encFake.m_offset);
@@ -170,10 +189,15 @@ public class SwerveModule implements Loggable
 	public void ReloadConfig(String s)
 	{
 	/////////////////////////////////////////////////////
+		SpeedP = Config.getSetting("speedP",1);
+		SpeedI = Config.getSetting("speedI",0);
+		SpeedD = Config.getSetting("speedD",0);
+		drive.setPID(SpeedP, SpeedI, SpeedD);
 		SteerP = Config.getSetting("steerP"+s,2);
 		SteerI = Config.getSetting("steerI"+s,0);
 		SteerD = Config.getSetting("steerD"+s,0);
 		PIDc.setPID(SteerP,SteerI,SteerD);
+		MaxRPM = Config.getSetting("driveCIMmaxRPM", 4200);
 	///////////////////////////////////////////////////////////////////
 		SteerTolerance = Config.getSetting("SteeringTolerance", 0.25);
 		SteerSpeed = Config.getSetting("SteerSpeed", 1);
