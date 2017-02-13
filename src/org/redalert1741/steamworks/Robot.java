@@ -19,6 +19,8 @@ public class Robot extends IterativeRobot
 	private static DataLogger logger;
 	private static Timer timer;
 	private static PowerDistributionPanel pdp;
+	private static Solenoid redLED;
+	private static Solenoid whiteLED;
 	@SuppressWarnings("unused")
 	private String auto = "";
 	
@@ -63,6 +65,8 @@ public class Robot extends IterativeRobot
 		timer = new Timer();
 		logger = new DataLogger();
 		pdp = new PowerDistributionPanel(20);
+		redLED = new Solenoid(0);
+		whiteLED = new Solenoid(1);
 		scopeToggler = new ScopeToggler(0,1);
 		Config.loadFromFile("/home/lvuser/config.txt");
 		////////////////////////////////////////////////
@@ -79,14 +83,14 @@ public class Robot extends IterativeRobot
 		FLe = new AnalogInput(2);
 		BRe = new AnalogInput(3);
 		BLe = new AnalogInput(1);
-	   	FR = new CANTalon(1);
-    	FRa = new CANTalon(5);
-    	FL = new CANTalon(3);
-    	FLa = new CANTalon(7);
-    	BR = new CANTalon(4);
-    	BRa = new CANTalon(8);
-    	BL = new CANTalon(2);
-    	BLa = new CANTalon(6);
+	  FR = new CANTalon(1);
+    FRa = new CANTalon(5);
+    FL = new CANTalon(3);
+    FLa = new CANTalon(7);
+    BR = new CANTalon(4);
+    BRa = new CANTalon(8);
+    BL = new CANTalon(2);
+    BLa = new CANTalon(6);
 		drive = new SwerveDrive(FR, FRa, FRe, FL, FLa, FLe, BR, BRa, BRe, BL, BLa, BLe);
 		////////////////////////////////////////////////
 		driver = new XboxController(4);
@@ -140,6 +144,8 @@ public class Robot extends IterativeRobot
 	@Override
 	public void teleopPeriodic()
 	{
+		redLED.set(true);
+		whiteLED.set(true);
     	///////////////////////////////////////////////////////////////////////////
     	//Utility
 		scopeToggler.startLoop(); // Must be first line in periodic
