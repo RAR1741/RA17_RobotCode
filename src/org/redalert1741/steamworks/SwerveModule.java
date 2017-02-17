@@ -120,9 +120,10 @@ public class SwerveModule implements Loggable
 		PIDc.setSetpoint(angle*(SteerEncMax/360.0f));
 	}
 	
-	public double calibrateAngle() 
+	public double[] calibrateAngle() 
 	{
 		double max = 0;
+		double min = 10;
 		Timer t = new Timer();
 		t.reset();
 		t.start();
@@ -151,10 +152,14 @@ public class SwerveModule implements Loggable
 			{
 				max = encoder.getVoltage();
 			}
+			if(encoder.getVoltage() < min)
+			{
+				min = encoder.getVoltage();
+			}
 		}
 		angle.set(0);
 		angle.setControlMode(0);
-		return max;
+		return new double[] {min,max};
 	}
 	
 	@Override

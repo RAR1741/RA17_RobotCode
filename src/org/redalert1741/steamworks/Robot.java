@@ -83,14 +83,14 @@ public class Robot extends IterativeRobot
 		FLe = new AnalogInput(2);
 		BRe = new AnalogInput(3);
 		BLe = new AnalogInput(1);
-	  FR = new CANTalon(1);
-    FRa = new CANTalon(5);
-    FL = new CANTalon(3);
-    FLa = new CANTalon(7);
-    BR = new CANTalon(4);
-    BRa = new CANTalon(8);
-    BL = new CANTalon(2);
-    BLa = new CANTalon(6);
+		FR = new CANTalon(1);
+		FRa = new CANTalon(5);
+		FL = new CANTalon(3);
+		FLa = new CANTalon(7);
+		BR = new CANTalon(4);
+		BRa = new CANTalon(8);
+		BL = new CANTalon(2);
+		BLa = new CANTalon(6);
 		drive = new SwerveDrive(FR, FRa, FRe, FL, FLa, FLe, BR, BRa, BRe, BL, BLa, BLe);
 		////////////////////////////////////////////////
 		driver = new XboxController(4);
@@ -218,9 +218,9 @@ public class Robot extends IterativeRobot
     	if(driver.getStartButton())
     	{
     		maxEncValue = drive.calibrateAngle();
-    		for(double x: maxEncValue)
+    		for(double[] x: maxEncValue)
     		{
-    			System.out.println(x);
+    			System.out.println("Min: " + x[0] + "\tMax: " + x[1]);
     		}
     	}
 	}

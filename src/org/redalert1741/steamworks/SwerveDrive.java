@@ -211,9 +211,9 @@ public class SwerveDrive implements Loggable
 		module.setEncMax(max);
 	}
 	
-	public double[] calibrateAngle()
+	public double[][] calibrateAngle()
 	{
-		double[] max = new double[4];
+		double[][] max = new double[4][2];
 		max[0] = FRM.calibrateAngle();
 		max[1] = FLM.calibrateAngle();
 		max[2] = BRM.calibrateAngle();
