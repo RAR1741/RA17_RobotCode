@@ -24,7 +24,7 @@ public class Robot extends IterativeRobot
 	@SuppressWarnings("unused")
 	private String auto = "";
 	
-	private double[] maxEncValue = new double[4];
+	private double[][] maxEncValue = new double[4][2];
 	
 	public static SwerveDrive drive;
 	public static Climber climber;
