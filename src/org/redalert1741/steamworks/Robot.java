@@ -29,9 +29,11 @@ public class Robot extends IterativeRobot
 	public static SwerveDrive drive;
 	public static Climber climber;
 	public static GearPlacer gear;
+	public static Manipulation manip;
 	
 	private static XboxController driver;
 	private static EdgeDetect driveMode;
+	private static EdgeDetect collection;
 	
 	private static CANTalon FR;
 	private static CANTalon FRa;
@@ -55,6 +57,7 @@ public class Robot extends IterativeRobot
 	private double twist;
 //	private double autoAimOffset;
 	private boolean fieldOrient = true;
+	private boolean collect = true;
 //	private boolean configReload;
 	private JsonAutonomous auton;
 	private ScopeToggler scopeToggler;
@@ -96,6 +99,7 @@ public class Robot extends IterativeRobot
 		driver = new XboxController(4);
 		////////////////////////////////////////////////
 		driveMode = new EdgeDetect();
+		collection = new EdgeDetect();
 		////////////////////////////////////////////////
 		cameraSource = new FakePIDSource();
 		driveOutput = new FakePIDOutput();
@@ -107,9 +111,12 @@ public class Robot extends IterativeRobot
 		driveAimer.setInputRange(-24,24);
 		driveAimer.setOutputRange(-.3,.3);
 		driveAimer.setAbsoluteTolerance(.5);
+		////////////////////////////////////////////////
 		climber = new Climber(0, 1);
 		////////////////////////////////////////////////
 		gear = new GearPlacer(2);
+		////////////////////////////////////////////////
+		manip = new Manipulation(3,4,22);
 		ReloadConfig();
 	}
 //========================================================================================================
@@ -194,8 +201,23 @@ public class Robot extends IterativeRobot
     	}
     	else
     	{
-    		gear.stop();
+ //   		gear.stop();
     	}
+    	///////////////////////////////////////////////////////////////////////////
+    	//Manipulation
+    	if(collection.Check(driver.getXButton()))
+    	{
+    		collect = !collect;
+    	}
+    	if(collect)
+    	{
+    		manip.setInput(0.6, 0.7);
+    	}
+    	else
+    	{
+    		manip.setInput(0, 0);
+    	}
+    	
     	scopeToggler.endLoop();
 	}
 //========================================================================================================
