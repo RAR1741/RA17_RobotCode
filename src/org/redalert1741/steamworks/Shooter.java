@@ -10,15 +10,13 @@ import com.ctre.CANTalon.TalonControlMode;
 
 public class Shooter implements Loggable, Configurable
 {
-	CANTalon flyWheel;
-	CANTalon angle;
+	private CANTalon flyWheel;
 	double p,i,d,f;
 	double wallRPM;
 	
-	public Shooter(CANTalon m, CANTalon a)
+	public Shooter(CANTalon m)
 	{
 		flyWheel = m;
-		angle = a;
 		
     	flyWheel.setFeedbackDevice(FeedbackDevice.QuadEncoder);
     	flyWheel.reverseSensor(false);
@@ -34,32 +32,31 @@ public class Shooter implements Loggable, Configurable
     	flyWheel.enable();
 	}
 	
+	public void setSpeed(double rpm)
+	{
+		flyWheel.set(rpm);
+	}
+	
 	@Override
 	public void setupLogging(DataLogger logger) 
 	{
-		logger.addAttribute("OutputV");
-		logger.addAttribute("OutputCurrent");
-		logger.addAttribute("EncPos");
-		logger.addAttribute("EncVelocity");
-		logger.addAttribute("Speed");
-		logger.addAttribute("Position");
-		logger.addAttribute("Setpoint");
-		logger.addAttribute("IA");
-		logger.addAttribute("ControlMode");
+		logger.addAttribute("ShootOutputV");
+		logger.addAttribute("ShootOutputCurrent");
+		logger.addAttribute("ShootEncPos");
+		logger.addAttribute("ShootEncVelocity");
+		logger.addAttribute("ShootSpeed");
+		logger.addAttribute("ShootSetpoint");
 	}
 
 	@Override
 	public void log(DataLogger logger) 
 	{
-		logger.log("OutputV", flyWheel.getOutputVoltage());
-		logger.log("OutputCurrent", flyWheel.getOutputCurrent());
-		logger.log("EncPos", flyWheel.getEncPosition());
-		logger.log("EncVelocity", flyWheel.getEncVelocity());
-		logger.log("Speed", flyWheel.getSpeed());
-		logger.log("Position", flyWheel.getPosition());
-		logger.log("Setpoint", flyWheel.getSetpoint());
-		logger.log("IA", flyWheel.getSetpoint());
-		logger.log("ControlMode", flyWheel.getControlMode().toString());
+		logger.log("ShootOutputV", flyWheel.getOutputVoltage());
+		logger.log("ShootOutputCurrent", flyWheel.getOutputCurrent());
+		logger.log("ShootEncPos", flyWheel.getEncPosition());
+		logger.log("ShootEncVelocity", flyWheel.getEncVelocity());
+		logger.log("ShootSpeed", flyWheel.getSpeed());
+		logger.log("ShootSetpoint", flyWheel.getSetpoint());
 	}
 
 	@Override
