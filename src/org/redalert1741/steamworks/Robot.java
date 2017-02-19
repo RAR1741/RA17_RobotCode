@@ -8,6 +8,7 @@ import org.redalert1741.robotBase.config.*;
 import org.redalert1741.robotBase.input.*;
 
 import com.ctre.CANTalon;
+import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -35,22 +36,22 @@ public class Robot extends IterativeRobot
 	private static EdgeDetect driveMode;
 	private static EdgeDetect collection;
 	
-	private static CANTalon FR;
-	private static CANTalon FRa;
-	private static CANTalon FL;
-	private static CANTalon FLa;
-	private static CANTalon BR;
-	private static CANTalon BRa;
-	private static CANTalon BL;
-	private static CANTalon BLa;
-	private static AnalogInput FRe;
-	private static AnalogInput FLe;
-	private static AnalogInput BRe;
-	private static AnalogInput BLe;
+//	private static CANTalon FR;
+//	private static CANTalon FRa;
+//	private static CANTalon FL;
+//	private static CANTalon FLa;
+//	private static CANTalon BR;
+//	private static CANTalon BRa;
+//	private static CANTalon BL;
+//	private static CANTalon BLa;
+//	private static AnalogInput FRe;
+//	private static AnalogInput FLe;
+//	private static AnalogInput BRe;
+//	private static AnalogInput BLe;
 	
-	private static PIDController driveAimer;
-	private static FakePIDSource cameraSource;
-	private static FakePIDOutput driveOutput;
+//	private static PIDController driveAimer;
+//	private static FakePIDSource cameraSource;
+//	private static FakePIDOutput driveOutput;
 	
 	private double x;
 	private double y;
@@ -61,6 +62,8 @@ public class Robot extends IterativeRobot
 //	private boolean configReload;
 	private JsonAutonomous auton;
 	private ScopeToggler scopeToggler;
+	Shooter shooter;
+	CANTalon fly;
 	
 	@Override
 	public void robotInit()
@@ -73,50 +76,53 @@ public class Robot extends IterativeRobot
 		scopeToggler = new ScopeToggler(0,1);
 		Config.loadFromFile("/home/lvuser/config.txt");
 		////////////////////////////////////////////////
-		try
-		{
-			navx = new LoggableNavX(Port.kMXP);
-		}
-		catch (RuntimeException ex )
-		{
-            DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
-		}
+//		try
+//		{
+//			navx = new LoggableNavX(Port.kMXP);
+//		}
+//		catch (RuntimeException ex )
+//		{
+//            DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
+//		}
+		fly = new CANTalon(2);
+		fly.changeControlMode(TalonControlMode.PercentVbus);
+		//shooter = new Shooter(fly, null);
 		////////////////////////////////////////////////
-		FRe = new AnalogInput(0);
-		FLe = new AnalogInput(2);
-		BRe = new AnalogInput(3);
-		BLe = new AnalogInput(1);
-		FR = new CANTalon(1);
-		FRa = new CANTalon(5);
-		FL = new CANTalon(3);
-		FLa = new CANTalon(7);
-		BR = new CANTalon(4);
-		BRa = new CANTalon(8);
-		BL = new CANTalon(2);
-		BLa = new CANTalon(6);
-		drive = new SwerveDrive(FR, FRa, FRe, FL, FLa, FLe, BR, BRa, BRe, BL, BLa, BLe);
+//		FRe = new AnalogInput(0);
+//		FLe = new AnalogInput(2);
+//		BRe = new AnalogInput(3);
+//		BLe = new AnalogInput(1);
+//		FR = new CANTalon(1);
+//		FRa = new CANTalon(5);
+//		FL = new CANTalon(3);
+//		FLa = new CANTalon(7);
+//		BR = new CANTalon(4);
+//		BRa = new CANTalon(8);
+//		BL = new CANTalon(2);
+//		BLa = new CANTalon(6);
+//		drive = new SwerveDrive(FR, FRa, FRe, FL, FLa, FLe, BR, BRa, BRe, BL, BLa, BLe);
 		////////////////////////////////////////////////
 		driver = new XboxController(4);
 		////////////////////////////////////////////////
-		driveMode = new EdgeDetect();
-		collection = new EdgeDetect();
+//		driveMode = new EdgeDetect();
+//		collection = new EdgeDetect();
 		////////////////////////////////////////////////
-		cameraSource = new FakePIDSource();
-		driveOutput = new FakePIDOutput();
-		driveAimer = new PIDController(Config.getSetting("AutoAimP", 0.12),
-									   Config.getSetting("AutoAimI", 0.00),
-									   Config.getSetting("AutoAimD", 0.00),
-									   cameraSource,
-									   driveOutput);
-		driveAimer.setInputRange(-24,24);
-		driveAimer.setOutputRange(-.3,.3);
-		driveAimer.setAbsoluteTolerance(.5);
+//		cameraSource = new FakePIDSource();
+//		driveOutput = new FakePIDOutput();
+//		driveAimer = new PIDController(Config.getSetting("AutoAimP", 0.12),
+//									   Config.getSetting("AutoAimI", 0.00),
+//									   Config.getSetting("AutoAimD", 0.00),
+//									   cameraSource,
+//									   driveOutput);
+//		driveAimer.setInputRange(-24,24);
+//		driveAimer.setOutputRange(-.3,.3);
+//		driveAimer.setAbsoluteTolerance(.5);
 		////////////////////////////////////////////////
-		climber = new Climber(0, 1);
-		////////////////////////////////////////////////
-		gear = new GearPlacer(2);
-		////////////////////////////////////////////////
-		manip = new Manipulation(3,4,22);
+//		climber = new Climber(0, 1);
+//		////////////////////////////////////////////////
+//		gear = new GearPlacer(2);
+//		////////////////////////////////////////////////
+//		manip = new Manipulation(3,4,22);
 		ReloadConfig();
 	}
 //========================================================================================================
@@ -124,7 +130,7 @@ public class Robot extends IterativeRobot
 	public void autonomousInit()
 	{
 		setupPeriodic("auto");
-		drive.angleToZero();
+		//drive.angleToZero();
 		auton = new JsonAutonomous("/home/lvuser/auto-test.json");
 	}
 
@@ -145,9 +151,11 @@ public class Robot extends IterativeRobot
 //========================================================================================================
 	@Override
     public void teleopInit()
-    { setupPeriodic("teleop")
+    { //setupPeriodic("teleop")
     ; }
-
+	
+	double speed = 0;
+	
 	@Override
 	public void teleopPeriodic()
 	{
@@ -156,67 +164,73 @@ public class Robot extends IterativeRobot
     	///////////////////////////////////////////////////////////////////////////
     	//Utility
 		scopeToggler.startLoop(); // Must be first line in periodic
-    	log(timer.get());
+    	//log(timer.get());
     	if(driver.getBackButton())
     	{
     		ReloadConfig();
     	}
     	///////////////////////////////////////////////////////////////////////////
     	//Drive
-    	x = driver.getX(Hand.kLeft);
-    	y = driver.getY(Hand.kLeft);
-    	twist = driver.getX(Hand.kRight);
-    	
-    	if(x >= -0.05 && x <= 0.05){x=0;}
-    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { x=0.5*x; }
-    	if(y >= -0.05 && y <= 0.05){y=0;}
-    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { y=0.5*y; }
-    	if(twist >= -0.05 && twist <= 0.05){twist=0;}
-    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { twist=0.5*twist; }
-    	else { twist=0.8*twist; }
-    	if(driveMode.Check(driver.getStartButton()))
-    	{
-    		fieldOrient = !fieldOrient;
-    	}
-    	drive.swerve(-x,-y,-twist,0,fieldOrient);
+//    	x = driver.getX(Hand.kLeft);
+//    	y = driver.getY(Hand.kLeft);
+//    	twist = driver.getX(Hand.kRight);
+//    	
+//    	if(x >= -0.05 && x <= 0.05){x=0;}
+//    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { x=0.5*x; }
+//    	if(y >= -0.05 && y <= 0.05){y=0;}
+//    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { y=0.5*y; }
+//    	if(twist >= -0.05 && twist <= 0.05){twist=0;}
+//    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { twist=0.5*twist; }
+//    	else { twist=0.8*twist; }
+//    	if(driveMode.Check(driver.getStartButton()))
+//    	{
+//    		fieldOrient = !fieldOrient;
+//    	}
+    	if(driver.getBumper(Hand.kLeft)) speed+=0.01;
+    	if(driver.getBumper(Hand.kRight)) speed-=0.01;
+    	if(driver.getBButton()) speed = 0;
+    	//speed = -driver.getTriggerAxis(Hand.kRight);
+    	System.out.println(speed);
+    	fly.set(speed);
+    	//drive.swerve(-x,-y,-twist,0,fieldOrient);
     	///////////////////////////////////////////////////////////////////////////
     	//Climber
-    	if(driver.getTriggerAxis(Hand.kRight) > 0.1)
-    	{
-    		climber.climb(driver.getTriggerAxis(Hand.kRight));
-    	}
-    	else
-    	{
-    		climber.climb(0);
-    	}
+//    	if(driver.getTriggerAxis(Hand.kRight) > 0.1)
+//    	{
+//    		climber.climb(driver.getTriggerAxis(Hand.kRight));
+//    	}
+//    	else
+//    	{
+//    		climber.climb(0);
+//    	}
     	///////////////////////////////////////////////////////////////////////////
     	//Gear
-    	if(driver.getBumper(Hand.kLeft))
-    	{
-    		gear.close();
-    	}
-    	else if(driver.getBumper(Hand.kRight))
-    	{
-    		gear.open();
-    	}
-    	else
-    	{
- //   		gear.stop();
-    	}
+//    	if(driver.getBumper(Hand.kLeft))
+//    	{
+//    		gear.close();
+//    	}
+//    	else if(driver.getBumper(Hand.kRight))
+//    	{
+//    		gear.open();
+//    	}
+//    	else
+//    	{
+// //   		gear.stop();
+//    	}
     	///////////////////////////////////////////////////////////////////////////
-    	//Manipulation
-    	if(collection.Check(driver.getXButton()))
-    	{
-    		collect = !collect;
-    	}
-    	if(collect)
-    	{
-    		manip.setInput(0.6, 0.7);
-    	}
-    	else
-    	{
-    		manip.setInput(0, 0);
-    	}
+//    	//Manipulation
+//    	if(collection.Check(driver.getXButton()))
+//    	{
+//    		collect = !collect;
+//    	}
+//    	if(collect)
+//    	{
+//    		manip.setInput(0.6, 0.7);
+//    	}
+//    	else
+//    	{
+//    		manip.setInput(0, 0);
+//    	}
     	
     	scopeToggler.endLoop();
 	}
@@ -231,7 +245,7 @@ public class Robot extends IterativeRobot
 	public void testPeriodic()
 	{
 		log(timer.get());
-    	drive.swerve(0,0,0,0,fieldOrient);
+    	//drive.swerve(0,0,0,0,fieldOrient);
     	if(driver.getBackButton())
     	{
     		ReloadConfig();
@@ -239,7 +253,7 @@ public class Robot extends IterativeRobot
     	
     	if(driver.getStartButton())
     	{
-    		maxEncValue = drive.calibrateAngle();
+    		//maxEncValue = drive.calibrateAngle();
     		for(double[] x: maxEncValue)
     		{
     			System.out.println("Min: " + x[0] + "\tMax: " + x[1]);
@@ -279,7 +293,7 @@ public class Robot extends IterativeRobot
 		logger.addAttribute("Time");
 		logger.addAttribute("ClimberA1");
 		logger.addAttribute("ClimberA2");
-		logger.addLoggable(drive);
+		//logger.addLoggable(drive);
 		logger.addLoggable(navx);
 		logger.addLoggable(gear);
 		logger.setupLoggables();
@@ -299,7 +313,7 @@ public class Robot extends IterativeRobot
 	{
 		Config.loadFromFile("/home/lvuser/config.txt");
 		//autoAimOffset = Config.getSetting("autoAimOffest", 0);
-		drive.ReloadConfig();
+		//drive.ReloadConfig();
 	}
 }
 
