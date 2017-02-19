@@ -186,8 +186,8 @@ public class Robot extends IterativeRobot
 //    	{
 //    		fieldOrient = !fieldOrient;
 //    	}
-    	if(driver.getBumper(Hand.kLeft)) speed+=0.01;
-    	if(driver.getBumper(Hand.kRight)) speed-=0.01;
+    	if(driver.getBumper(Hand.kLeft)) speed+=0.001;
+    	if(driver.getBumper(Hand.kRight)) speed-=0.001;
     	if(driver.getBButton()) speed = 0;
     	//speed = -driver.getTriggerAxis(Hand.kRight);
     	System.out.println(speed);
