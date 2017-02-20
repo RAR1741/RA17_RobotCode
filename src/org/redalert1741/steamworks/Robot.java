@@ -156,6 +156,7 @@ public class Robot extends IterativeRobot
 	@Override
     public void teleopInit()
     { setupPeriodic("teleop")
+	; navx.reset();
 	; collect = false;
     ; }
 
@@ -189,7 +190,7 @@ public class Robot extends IterativeRobot
     	{
     		fieldOrient = !fieldOrient;
     	}
-    	drive.swerve(-x,-y,-twist,0,fieldOrient);
+    	drive.swerve(-x,-y,-twist,-navx.getAngle(),fieldOrient);
     	///////////////////////////////////////////////////////////////////////////
     	//Climber
     	if(driver.getTriggerAxis(Hand.kRight) > 0.1)
