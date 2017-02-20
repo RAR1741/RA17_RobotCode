@@ -222,7 +222,7 @@ public class Robot extends IterativeRobot
     	}
     	if(collect)
     	{
-    		manip.setInput(0.6, -0.7);
+    		manip.setInput(0.7, -0.6);
     	}
     	else
     	{
