@@ -30,6 +30,8 @@ public class Robot extends IterativeRobot
 	public static Climber climber;
 	public static GearPlacer gear;
 	public static Manipulation manip;
+	public static Shooter shooter;
+	public static Carousel carousel;
 	
 	private static XboxController driver;
 	private static EdgeDetect driveMode;
@@ -115,8 +117,16 @@ public class Robot extends IterativeRobot
 		climber = new Climber(0, 1);
 		////////////////////////////////////////////////
 		gear = new GearPlacer(2);
+		Config.addConfigurable(gear);
 		////////////////////////////////////////////////
 		manip = new Manipulation(3,4,22);
+		
+		shooter = new Shooter(new CANTalon(10));
+		Config.addConfigurable(shooter);
+		
+		carousel = new Carousel(new CANTalon(9));
+		Config.addConfigurable(carousel);
+		
 		ReloadConfig();
 	}
 //========================================================================================================
@@ -146,6 +156,7 @@ public class Robot extends IterativeRobot
 	@Override
     public void teleopInit()
     { setupPeriodic("teleop")
+	; collect = false;
     ; }
 
 	@Override
@@ -211,12 +222,35 @@ public class Robot extends IterativeRobot
     	}
     	if(collect)
     	{
-    		manip.setInput(0.6, 0.7);
+    		manip.setInput(0.7, -0.6);
     	}
     	else
     	{
     		manip.setInput(0, 0);
     	}
+    	
+    	if(driver.getAButton())
+    	{
+    		shooter.setSpeed(-2600);
+    	}
+    	else
+    	{
+    		shooter.setSpeed(0);
+    	}
+    	
+    	if(driver.getPOV() == 0)
+    	{
+    		carousel.forward();
+    	}
+    	else if(driver.getPOV() == 180)
+    	{
+    		carousel.reverse();
+    	}
+    	else
+    	{
+    		carousel.stop();
+    	}
+    	System.out.println(driver.getPOV());
     	
     	scopeToggler.endLoop();
 	}
@@ -282,6 +316,8 @@ public class Robot extends IterativeRobot
 		logger.addLoggable(drive);
 		logger.addLoggable(navx);
 		logger.addLoggable(gear);
+		logger.addLoggable(shooter);
+		logger.addLoggable(carousel);
 		logger.setupLoggables();
 		logger.writeAttributes();
 	}
@@ -298,6 +334,7 @@ public class Robot extends IterativeRobot
 	void ReloadConfig()
 	{
 		Config.loadFromFile("/home/lvuser/config.txt");
+		Config.reloadConfig();
 		//autoAimOffset = Config.getSetting("autoAimOffest", 0);
 		drive.ReloadConfig();
 	}

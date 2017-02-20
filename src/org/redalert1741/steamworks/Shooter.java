@@ -10,15 +10,13 @@ import com.ctre.CANTalon.TalonControlMode;
 
 public class Shooter implements Loggable, Configurable
 {
-	CANTalon flyWheel;
-	CANTalon angle;
+	private CANTalon flyWheel;
 	double p,i,d,f;
 	double wallRPM;
 	
-	public Shooter(CANTalon m, CANTalon a)
+	public Shooter(CANTalon m)
 	{
 		flyWheel = m;
-		angle = a;
 		
     	flyWheel.setFeedbackDevice(FeedbackDevice.QuadEncoder);
     	flyWheel.reverseSensor(false);
@@ -27,47 +25,55 @@ public class Shooter implements Loggable, Configurable
     	flyWheel.configPeakOutputVoltage(+12.0f, -12.0f);
     	flyWheel.setProfile(0);
     	flyWheel.setF(Config.getSetting("FlyF", 0));
-    	flyWheel.setPID(Config.getSetting("FlyP", 1), 
-    					Config.getSetting("FlyI", 0), 
-    					Config.getSetting("FlyD", 0));
+    	flyWheel.setPID(Config.getSetting("FlyP", 13), 
+    					Config.getSetting("FlyI", 0.008), 
+    					Config.getSetting("FlyD", 100));
+    	flyWheel.enableBrakeMode(false);
     	flyWheel.configEncoderCodesPerRev(20);//40 for CIMcoder
     	flyWheel.enable();
+	}
+	
+	public void setSpeed(double rpm)
+	{
+		if(rpm == 0)
+		{
+			flyWheel.changeControlMode(TalonControlMode.PercentVbus);
+		}
+		else
+		{
+			flyWheel.changeControlMode(TalonControlMode.Speed);
+		}
+		flyWheel.set(rpm);
 	}
 	
 	@Override
 	public void setupLogging(DataLogger logger) 
 	{
-		logger.addAttribute("OutputV");
-		logger.addAttribute("OutputCurrent");
-		logger.addAttribute("EncPos");
-		logger.addAttribute("EncVelocity");
-		logger.addAttribute("Speed");
-		logger.addAttribute("Position");
-		logger.addAttribute("Setpoint");
-		logger.addAttribute("IA");
-		logger.addAttribute("ControlMode");
+		logger.addAttribute("ShootOutputV");
+		logger.addAttribute("ShootOutputCurrent");
+		logger.addAttribute("ShootEncPos");
+		logger.addAttribute("ShootEncVelocity");
+		logger.addAttribute("ShootSpeed");
+		logger.addAttribute("ShootSetpoint");
 	}
 
 	@Override
 	public void log(DataLogger logger) 
 	{
-		logger.log("OutputV", flyWheel.getOutputVoltage());
-		logger.log("OutputCurrent", flyWheel.getOutputCurrent());
-		logger.log("EncPos", flyWheel.getEncPosition());
-		logger.log("EncVelocity", flyWheel.getEncVelocity());
-		logger.log("Speed", flyWheel.getSpeed());
-		logger.log("Position", flyWheel.getPosition());
-		logger.log("Setpoint", flyWheel.getSetpoint());
-		logger.log("IA", flyWheel.getSetpoint());
-		logger.log("ControlMode", flyWheel.getControlMode().toString());
+		logger.log("ShootOutputV", flyWheel.getOutputVoltage());
+		logger.log("ShootOutputCurrent", flyWheel.getOutputCurrent());
+		logger.log("ShootEncPos", flyWheel.getEncPosition());
+		logger.log("ShootEncVelocity", flyWheel.getEncVelocity());
+		logger.log("ShootSpeed", flyWheel.getSpeed());
+		logger.log("ShootSetpoint", flyWheel.getSetpoint());
 	}
 
 	@Override
 	public void reloadConfig() 
 	{
-		p = Config.getSetting("FlyP", 1);
-		i = Config.getSetting("FlyI", 0);
-		d = Config.getSetting("FlyD", 0);
+		p = Config.getSetting("FlyP", 13);
+		i = Config.getSetting("FlyI", 0.008);
+		d = Config.getSetting("FlyD", 100);
 		f = Config.getSetting("FlyF", 0);
 		flyWheel.setF(f);
 		flyWheel.setPID(p, i, d);
