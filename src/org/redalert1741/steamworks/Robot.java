@@ -301,5 +301,10 @@ public class Robot extends IterativeRobot
 		//autoAimOffset = Config.getSetting("autoAimOffest", 0);
 		drive.ReloadConfig();
 	}
+	
+	public static boolean isCompetition()
+	{
+		return new File("/home/lvuser/comp.txt").exists();
+	}
 }
 
