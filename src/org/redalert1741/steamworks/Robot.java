@@ -136,6 +136,7 @@ public class Robot extends IterativeRobot
 		setupPeriodic("auto");
 		drive.angleToZero();
 		auton = new JsonAutonomous("/home/lvuser/auto-test.json");
+		System.gc();
 	}
 
 	@Override
@@ -158,6 +159,7 @@ public class Robot extends IterativeRobot
     { setupPeriodic("teleop")
 	; navx.reset();
 	; collect = false;
+	; System.gc();
     ; }
 
 	@Override
@@ -263,6 +265,7 @@ public class Robot extends IterativeRobot
 	public void testInit()
 	{
 		setupPeriodic("test");
+		System.gc();
 	}
 
 	@Override
@@ -283,6 +286,12 @@ public class Robot extends IterativeRobot
     			System.out.println("Min: " + x[0] + "\tMax: " + x[1]);
     		}
     	}
+	}
+	
+	@Override
+	public void disabledInit()
+	{
+		System.gc();
 	}
 //========================================================================================================
 	public void setupPeriodic(String period)
