@@ -156,6 +156,7 @@ public class Robot extends IterativeRobot
 	@Override
     public void teleopInit()
     { setupPeriodic("teleop")
+	; collect = false;
     ; }
 
 	@Override
@@ -221,7 +222,7 @@ public class Robot extends IterativeRobot
     	}
     	if(collect)
     	{
-    		manip.setInput(0.6, 0.7);
+    		manip.setInput(0.6, -0.7);
     	}
     	else
     	{
@@ -230,7 +231,7 @@ public class Robot extends IterativeRobot
     	
     	if(driver.getAButton())
     	{
-    		shooter.setSpeed(-4000);
+    		shooter.setSpeed(-2600);
     	}
     	else
     	{

@@ -25,9 +25,10 @@ public class Shooter implements Loggable, Configurable
     	flyWheel.configPeakOutputVoltage(+12.0f, -12.0f);
     	flyWheel.setProfile(0);
     	flyWheel.setF(Config.getSetting("FlyF", 0));
-    	flyWheel.setPID(Config.getSetting("FlyP", 1), 
-    					Config.getSetting("FlyI", 0), 
-    					Config.getSetting("FlyD", 0));
+    	flyWheel.setPID(Config.getSetting("FlyP", 13), 
+    					Config.getSetting("FlyI", 0.008), 
+    					Config.getSetting("FlyD", 100));
+    	flyWheel.enableBrakeMode(false);
     	flyWheel.configEncoderCodesPerRev(20);//40 for CIMcoder
     	flyWheel.enable();
 	}
@@ -62,9 +63,9 @@ public class Shooter implements Loggable, Configurable
 	@Override
 	public void reloadConfig() 
 	{
-		p = Config.getSetting("FlyP", 1);
-		i = Config.getSetting("FlyI", 0);
-		d = Config.getSetting("FlyD", 0);
+		p = Config.getSetting("FlyP", 13);
+		i = Config.getSetting("FlyI", 0.008);
+		d = Config.getSetting("FlyD", 100);
 		f = Config.getSetting("FlyF", 0);
 		flyWheel.setF(f);
 		flyWheel.setPID(p, i, d);
