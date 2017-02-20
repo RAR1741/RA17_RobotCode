@@ -1,0 +1,8 @@
+{
+	"auto":[
+		{"type":"drive-track","unit":"Feet","amount":100,"args":[0,0.15]},
+		{"type":"drive-fo","unit":"Seconds","amount":0.5,"args":[0,0.1]},
+		{"type":"gear","unit":"Invalid","amount":0,"args":[1]},
+		{"type":"drive-fo","unit":"Feet","amount":2,"args":[0,-0.2]}
+	]
+}
