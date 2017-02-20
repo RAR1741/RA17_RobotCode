@@ -87,25 +87,26 @@ public class SwerveDrive implements Loggable
 			BRM.PIDSet();
 			BLM.PIDSet();
 			
-			if(Math.abs(FRM.pidGet()/(FRM.getEncMax()/360.0f) - wa2) > 90)
+			double tmp;
+			if((tmp = closestAngle(FRM.pidGet()/(FRM.getEncMax()/360.0f), wa2)) != wa2)
 			{
-				wa2 = (wa2 + 180)%360;
-				ws2 = -ws2;
+				wa2 = tmp;
+				ws2 *= -1;
 			}
-			if(Math.abs(FLM.pidGet()/(FLM.getEncMax()/360.0f) - wa1) > 90)
+			if((tmp = closestAngle(FLM.pidGet()/(FLM.getEncMax()/360.0f), wa1)) != wa1)
 			{
-				wa1 = (wa1 + 180)%360;
-				ws1 = -ws1;
+				wa1 = tmp;
+				ws1 *= -1;
 			}
-			if(Math.abs(BRM.pidGet()/(BRM.getEncMax()/360.0f) - wa3) > 90)
+			if((tmp = closestAngle(BRM.pidGet()/(BRM.getEncMax()/360.0f), wa3)) != wa3)
 			{
-				wa3 = (wa3 + 180)%360;
-				ws3 = -ws3;
+				wa3 = tmp;
+				ws3 *= -1;
 			}
-			if(Math.abs(BLM.pidGet()/(BLM.getEncMax()/360.0f) - wa4) > 90)
+			if((tmp = closestAngle(BLM.pidGet()/(BLM.getEncMax()/360.0f), wa4)) != wa4)
 			{
-				wa4 = (wa4 + 180)%360;
-				ws4 = -ws4;
+				wa4 = tmp;
+				ws4 *= -1;
 			}
 			
 			FRM.setDriveSpeed(ws2);
@@ -131,10 +132,10 @@ public class SwerveDrive implements Loggable
 				FLM.PIDSet();
 				BRM.PIDSet();
 				BLM.PIDSet();
-				FRM.setDriveSpeed(0);
-				FLM.setDriveSpeed(0);
-				BRM.setDriveSpeed(0);
-				BLM.setDriveSpeed(0);
+				FRM.setDrive(0);
+				FLM.setDrive(0);
+				BRM.setDrive(0);
+				BLM.setDrive(0);
 			}
 		}
 	}
@@ -249,6 +250,24 @@ public class SwerveDrive implements Loggable
 		FLM.ReloadConfig("FL");
 		BRM.ReloadConfig("BR");
 		BLM.ReloadConfig("BL");
+	}
+	
+	/**
+	 * Finds the closest angle, including 180 degree weirdness
+	 * @param p Current position
+	 * @param t Target angle
+	 * @return
+	 */
+	public static double closestAngle(double p, double t)
+	{
+		p %= 360;
+		double t1 = t % 360;
+		double t2 = (t1+180)%360;
+		double d1 = Math.abs(p - t1);
+		if(d1 > 180) d1 = 360 - d1;
+		double d2 = Math.abs(p -t2);
+		if(d2 > 180) d2 = 360 - d2;
+		return (d1 < d2 ? t1 : t2);
 	}
 	
 	public String toString()

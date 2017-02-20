@@ -45,8 +45,8 @@ public class SwerveModule implements Loggable
 		drive = d;
 		drive.setPID(SpeedP, SpeedI, SpeedD);
 		drive.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-    	drive.configEncoderCodesPerRev(20);
-    	drive.enable();
+    drive.configEncoderCodesPerRev(20);
+    drive.enable();
 		
 		angle = a;
 		
