@@ -35,6 +35,14 @@ public class Shooter implements Loggable, Configurable
 	
 	public void setSpeed(double rpm)
 	{
+		if(rpm == 0)
+		{
+			flyWheel.changeControlMode(TalonControlMode.PercentVbus);
+		}
+		else
+		{
+			flyWheel.changeControlMode(TalonControlMode.Speed);
+		}
 		flyWheel.set(rpm);
 	}
 	
