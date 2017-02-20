@@ -83,17 +83,17 @@ public class Robot extends IterativeRobot
 		}
 		////////////////////////////////////////////////
 		FRe = new AnalogInput(0);
-		FLe = new AnalogInput(1);
+		FLe = new AnalogInput(isCompetition() ? 1 : 2);
 		BRe = new AnalogInput(3);
-		BLe = new AnalogInput(2);
+		BLe = new AnalogInput(isCompetition() ? 2 : 1);
 		FR = new CANTalon(1);
 		FRa = new CANTalon(5);
-		FL = new CANTalon(2);
-		FLa = new CANTalon(6);
+		FL = new CANTalon(isCompetition() ? 2 : 3);
+		FLa = new CANTalon(isCompetition() ? 6 : 7);
 		BR = new CANTalon(4);
 		BRa = new CANTalon(8);
-		BL = new CANTalon(3);
-		BLa = new CANTalon(7);
+		BL = new CANTalon(isCompetition() ? 3 : 2);
+		BLa = new CANTalon(isCompetition() ? 7 : 6);
 		drive = new SwerveDrive(FR, FRa, FRe, FL, FLa, FLe, BR, BRa, BRe, BL, BLa, BLe);
 		////////////////////////////////////////////////
 		driver = new XboxController(4);
