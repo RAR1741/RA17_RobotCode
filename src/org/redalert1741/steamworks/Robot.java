@@ -220,6 +220,7 @@ public class Robot extends IterativeRobot
     	{
     		collect = !collect;
     	}
+    	
     	if(collect)
     	{
     		manip.setInput(0.7, -0.6);
@@ -227,15 +228,6 @@ public class Robot extends IterativeRobot
     	else
     	{
     		manip.setInput(0, 0);
-    	}
-    	
-    	if(driver.getAButton())
-    	{
-    		shooter.setSpeed(-2600);
-    	}
-    	else
-    	{
-    		shooter.setSpeed(0);
     	}
     	
     	if(driver.getPOV() == 0)
@@ -250,6 +242,17 @@ public class Robot extends IterativeRobot
     	{
     		carousel.stop();
     	}
+    	///////////////////////////////////////////////////////////////////////////
+    	//Shooter
+    	if(driver.getAButton())
+    	{
+    		shooter.setSpeed(-2600);
+    	}
+    	else
+    	{
+    		shooter.stop();
+    	}
+
     	System.out.println(driver.getPOV());
     	
     	scopeToggler.endLoop();

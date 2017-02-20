@@ -13,6 +13,7 @@ public class Shooter implements Loggable, Configurable
 	private CANTalon flyWheel;
 	double p,i,d,f;
 	double wallRPM;
+	double boilerRPM;
 	
 	public Shooter(CANTalon m)
 	{
@@ -31,19 +32,26 @@ public class Shooter implements Loggable, Configurable
     	flyWheel.enableBrakeMode(false);
     	flyWheel.configEncoderCodesPerRev(20);//40 for CIMcoder
     	flyWheel.enable();
+    	
+    	boilerRPM = Config.getSetting("boilerRPM",2500);
+	}
+	
+	public void shoot()
+	{		
+		flyWheel.changeControlMode(TalonControlMode.Speed);
+		flyWheel.set(-boilerRPM);
 	}
 	
 	public void setSpeed(double rpm)
 	{
-		if(rpm == 0)
-		{
-			flyWheel.changeControlMode(TalonControlMode.PercentVbus);
-		}
-		else
-		{
-			flyWheel.changeControlMode(TalonControlMode.Speed);
-		}
+		flyWheel.changeControlMode(TalonControlMode.Speed);
 		flyWheel.set(rpm);
+	}
+	
+	public void stop()
+	{
+		flyWheel.changeControlMode(TalonControlMode.PercentVbus);
+		flyWheel.set(0);
 	}
 	
 	@Override
@@ -75,6 +83,7 @@ public class Shooter implements Loggable, Configurable
 		i = Config.getSetting("FlyI", 0.008);
 		d = Config.getSetting("FlyD", 100);
 		f = Config.getSetting("FlyF", 0);
+		boilerRPM = Config.getSetting("boilerRPM",2500);
 		flyWheel.setF(f);
 		flyWheel.setPID(p, i, d);
 	}
