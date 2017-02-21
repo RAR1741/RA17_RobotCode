@@ -85,17 +85,17 @@ public class Robot extends IterativeRobot
 		}
 		////////////////////////////////////////////////
 		FRe = new AnalogInput(0);
-		FLe = new AnalogInput(2);
+		FLe = new AnalogInput(isCompetition() ? 1 : 2);
 		BRe = new AnalogInput(3);
-		BLe = new AnalogInput(1);
+		BLe = new AnalogInput(isCompetition() ? 2 : 1);
 		FR = new CANTalon(1);
 		FRa = new CANTalon(5);
-		FL = new CANTalon(3);
-		FLa = new CANTalon(7);
+		FL = new CANTalon(isCompetition() ? 2 : 3);
+		FLa = new CANTalon(isCompetition() ? 6 : 7);
 		BR = new CANTalon(4);
 		BRa = new CANTalon(8);
-		BL = new CANTalon(2);
-		BLa = new CANTalon(6);
+		BL = new CANTalon(isCompetition() ? 3 : 2);
+		BLa = new CANTalon(isCompetition() ? 7 : 6);
 		drive = new SwerveDrive(FR, FRa, FRe, FL, FLa, FLe, BR, BRa, BRe, BL, BLa, BLe);
 		////////////////////////////////////////////////
 		driver = new XboxController(4);
@@ -133,6 +133,7 @@ public class Robot extends IterativeRobot
 	@Override
 	public void autonomousInit()
 	{
+		drive.setBrake();
 		setupPeriodic("auto");
 		drive.angleToZero();
 		auton = new JsonAutonomous("/home/lvuser/auto-test.json");
@@ -157,6 +158,7 @@ public class Robot extends IterativeRobot
 	@Override
     public void teleopInit()
     { setupPeriodic("teleop")
+	; drive.setCoast();
 	; navx.reset();
 	; collect = false;
 	; System.gc();
@@ -353,6 +355,11 @@ public class Robot extends IterativeRobot
 		Config.reloadConfig();
 		//autoAimOffset = Config.getSetting("autoAimOffest", 0);
 		drive.ReloadConfig();
+	}
+	
+	public static boolean isCompetition()
+	{
+		return new File("/home/lvuser/comp.txt").exists();
 	}
 }
 

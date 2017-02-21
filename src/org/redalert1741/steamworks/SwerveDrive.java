@@ -191,6 +191,22 @@ public class SwerveDrive implements Loggable
 		BLM.setAngle(wa4);
 	}
 	
+	public void setBrake()
+	{
+		FRM.setBrake();
+		FLM.setBrake();
+		BRM.setBrake();
+		BLM.setBrake();
+	}
+	
+	public void setCoast()
+	{
+		FRM.setCoast();
+		FLM.setCoast();
+		BRM.setCoast();
+		BLM.setCoast();
+	}
+	
 	public void angleToZero()
 	{
 		FRM.PIDSet();
