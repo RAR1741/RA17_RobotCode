@@ -257,8 +257,6 @@ public class Robot extends IterativeRobot
     	{
     		shooter.stop();
     	}
-
-    	System.out.println(driver.getPOV());
     	
     	scopeToggler.endLoop();
 	}

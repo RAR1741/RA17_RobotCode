@@ -35,6 +35,10 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	private final double TICKS_PER_ROTATION = 533.4;
 	private final double TICKS_PER_INCH = TICKS_PER_ROTATION / (4 * Math.PI);
 	
+	private FileReader fr;
+	private JsonReader jr;
+	private JsonParser jp;
+	
 	private enum Unit { Seconds, Milliseconds, EncoderTicks, Rotations, Inches, Feet, Degrees, Invalid };
 	
 	private static class AutoInstruction
@@ -76,7 +80,11 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		straighten.setPID(Config.getSetting("auto_straight_p", 0.2), 
 				Config.getSetting("auto_straight_i", 0),
 				Config.getSetting("auto_straight_d", 0));
-		
+		parseFile(file);
+	}
+	
+	public void parseFile(String file)
+	{
 		reloadConfig();
 		
 		step = -1;
@@ -85,7 +93,11 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		try
 		{
 			//System.out.println(new File(file).exists());
-			auto = new JsonParser().parse(new JsonReader(new FileReader(new File(file))));
+			fr = new FileReader(new File(file));
+			jr = new JsonReader(fr);
+			jp = new JsonParser();
+			auto = jp.parse(jr);
+			//auto = new JsonParser().parse(new JsonReader(new FileReader(new File(file))));
 			JsonElement inner = auto.getAsJsonObject().get("auto");
 			if(inner.isJsonArray())
 			{
