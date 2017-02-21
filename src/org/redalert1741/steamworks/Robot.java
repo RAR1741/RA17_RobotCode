@@ -256,6 +256,11 @@ public class Robot extends IterativeRobot
     		shooter.stop();
     	}
     	
+    	if(driver.getYButton())
+    	{
+    		ReloadConfig();
+    	}
+    	
     	scopeToggler.endLoop();
 	}
 //========================================================================================================
