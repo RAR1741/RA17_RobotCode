@@ -228,7 +228,7 @@ public class Robot extends IterativeRobot
     	
     	if(collect)
     	{
-    		manip.setInput(0.7, -0.6);
+			manip.setInput(isCompetition() ? -0.7 : 0.7, isCompetition() ? 0.6 : -0.6);
     	}
     	else
     	{
