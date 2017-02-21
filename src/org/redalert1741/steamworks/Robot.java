@@ -251,7 +251,7 @@ public class Robot extends IterativeRobot
     	//Shooter
     	if(driver.getAButton())
     	{
-    		shooter.setSpeed(-2600);
+    		shooter.shoot();
     	}
     	else
     	{
