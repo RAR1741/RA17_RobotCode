@@ -133,6 +133,7 @@ public class Robot extends IterativeRobot
 	@Override
 	public void autonomousInit()
 	{
+		drive.setBrake();
 		setupPeriodic("auto");
 		drive.angleToZero();
 		auton = new JsonAutonomous("/home/lvuser/auto-test.json");
@@ -157,6 +158,7 @@ public class Robot extends IterativeRobot
 	@Override
     public void teleopInit()
     { setupPeriodic("teleop")
+	; drive.setCoast();
 	; navx.reset();
 	; collect = false;
 	; System.gc();

@@ -221,4 +221,14 @@ public class SwerveModule implements Loggable
 	{
 		return drive.getEncPosition();
 	}
+
+	public void setBrake() 
+	{
+		drive.enableBrakeMode(true);
+	}
+	
+	public void setCoast()
+	{
+		drive.enableBrakeMode(false);
+	}
 }
