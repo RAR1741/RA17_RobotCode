@@ -14,6 +14,7 @@ public class Shooter implements Loggable, Configurable
 	double p,i,d,f;
 	double wallRPM;
 	double boilerRPM;
+	double rpmThreshold;
 	
 	public Shooter(CANTalon m)
 	{
@@ -31,6 +32,7 @@ public class Shooter implements Loggable, Configurable
     	flyWheel.enable();
     	
     	boilerRPM = Config.getSetting("boilerRPM",2500);
+    	rpmThreshold = Config.getSetting("ShooterRPMThreshold", 10);
 	}
 	
 	public void shoot()
@@ -81,6 +83,7 @@ public class Shooter implements Loggable, Configurable
 		d = Config.getSetting("FlyD", 100);
 		f = Config.getSetting("FlyF", 0);
 		boilerRPM = Config.getSetting("boilerRPM",2500);
+		rpmThreshold = Config.getSetting("ShooterRPMThreshold", 10);
 		flyWheel.setF(f);
 		flyWheel.setPID(p, i, d);
 	}
