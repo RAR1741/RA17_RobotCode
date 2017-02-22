@@ -22,9 +22,6 @@ public class Shooter implements Loggable, Configurable
     	flyWheel.setFeedbackDevice(FeedbackDevice.QuadEncoder);
     	flyWheel.reverseSensor(false);
     	flyWheel.changeControlMode(TalonControlMode.Speed);
-    	flyWheel.configNominalOutputVoltage(+0.0f, -0.0f);
-    	flyWheel.configPeakOutputVoltage(+12.0f, -12.0f);
-    	flyWheel.setProfile(0);
     	flyWheel.setF(Config.getSetting("FlyF", 0));
     	flyWheel.setPID(Config.getSetting("FlyP", 13), 
     					Config.getSetting("FlyI", 0.008), 
