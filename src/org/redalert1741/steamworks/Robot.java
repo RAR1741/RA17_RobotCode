@@ -313,7 +313,8 @@ public class Robot extends IterativeRobot
 		String robot = !(Config.getSetting("isPrototype", 0) == 0) ? "_proto" : "_comp";
 		l.close();
 		Calendar calendar = Calendar.getInstance();
-		String dir = "/home/lvuser";
+		String dir = "/home/lvuser/logs";
+		new File(dir).mkdirs();
 		if(new File("/media/sda").exists())
 		{
 			dir = "/media/sda";
