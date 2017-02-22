@@ -19,17 +19,23 @@ public class Robot extends IterativeRobot
 	private static DataLogger logger;
 	private static Timer timer;
 	private static PowerDistributionPanel pdp;
+	private static Solenoid redLED;
+	private static Solenoid whiteLED;
 	@SuppressWarnings("unused")
 	private String auto = "";
 	
-	private double[] maxEncValue = new double[4];
+	private double[][] maxEncValue = new double[4][2];
 	
 	public static SwerveDrive drive;
 	public static Climber climber;
 	public static GearPlacer gear;
+	public static Manipulation manip;
+	public static Shooter shooter;
+	public static Carousel carousel;
 	
 	private static XboxController driver;
 	private static EdgeDetect driveMode;
+	private static EdgeDetect collection;
 	
 	private static CANTalon FR;
 	private static CANTalon FRa;
@@ -53,8 +59,10 @@ public class Robot extends IterativeRobot
 	private double twist;
 //	private double autoAimOffset;
 	private boolean fieldOrient = true;
+	private boolean collect = true;
 //	private boolean configReload;
 	private JsonAutonomous auton;
+	private ScopeToggler scopeToggler;
 	
 	@Override
 	public void robotInit()
@@ -62,6 +70,9 @@ public class Robot extends IterativeRobot
 		timer = new Timer();
 		logger = new DataLogger();
 		pdp = new PowerDistributionPanel(20);
+		redLED = new Solenoid(0);
+		whiteLED = new Solenoid(1);
+		scopeToggler = new ScopeToggler(0,1);
 		Config.loadFromFile("/home/lvuser/config.txt");
 		////////////////////////////////////////////////
 		try
@@ -74,22 +85,23 @@ public class Robot extends IterativeRobot
 		}
 		////////////////////////////////////////////////
 		FRe = new AnalogInput(0);
-		FLe = new AnalogInput(2);
+		FLe = new AnalogInput(isCompetition() ? 1 : 2);
 		BRe = new AnalogInput(3);
-		BLe = new AnalogInput(1);
-	   	FR = new CANTalon(1);
-    	FRa = new CANTalon(5);
-    	FL = new CANTalon(3);
-    	FLa = new CANTalon(7);
-    	BR = new CANTalon(4);
-    	BRa = new CANTalon(8);
-    	BL = new CANTalon(2);
-    	BLa = new CANTalon(6);
+		BLe = new AnalogInput(isCompetition() ? 2 : 1);
+		FR = new CANTalon(1);
+		FRa = new CANTalon(5);
+		FL = new CANTalon(isCompetition() ? 2 : 3);
+		FLa = new CANTalon(isCompetition() ? 6 : 7);
+		BR = new CANTalon(4);
+		BRa = new CANTalon(8);
+		BL = new CANTalon(isCompetition() ? 3 : 2);
+		BLa = new CANTalon(isCompetition() ? 7 : 6);
 		drive = new SwerveDrive(FR, FRa, FRe, FL, FLa, FLe, BR, BRa, BRe, BL, BLa, BLe);
 		////////////////////////////////////////////////
 		driver = new XboxController(4);
 		////////////////////////////////////////////////
 		driveMode = new EdgeDetect();
+		collection = new EdgeDetect();
 		////////////////////////////////////////////////
 		cameraSource = new FakePIDSource();
 		driveOutput = new FakePIDOutput();
@@ -101,18 +113,31 @@ public class Robot extends IterativeRobot
 		driveAimer.setInputRange(-24,24);
 		driveAimer.setOutputRange(-.3,.3);
 		driveAimer.setAbsoluteTolerance(.5);
+		////////////////////////////////////////////////
 		climber = new Climber(0, 1);
 		////////////////////////////////////////////////
 		gear = new GearPlacer(2);
+		Config.addConfigurable(gear);
+		////////////////////////////////////////////////
+		manip = new Manipulation(3,4,22);
+		
+		shooter = new Shooter(new CANTalon(10));
+		Config.addConfigurable(shooter);
+		
+		carousel = new Carousel(new CANTalon(9));
+		Config.addConfigurable(carousel);
+		
 		ReloadConfig();
 	}
 //========================================================================================================
 	@Override
 	public void autonomousInit()
 	{
+		drive.setBrake();
 		setupPeriodic("auto");
 		drive.angleToZero();
 		auton = new JsonAutonomous("/home/lvuser/auto-test.json");
+		System.gc();
 	}
 
 	@Override
@@ -133,13 +158,20 @@ public class Robot extends IterativeRobot
 	@Override
     public void teleopInit()
     { setupPeriodic("teleop")
+	; drive.setCoast();
+	; navx.reset();
+	; collect = false;
+	; System.gc();
     ; }
 
 	@Override
 	public void teleopPeriodic()
 	{
+		redLED.set(true);
+		whiteLED.set(true);
     	///////////////////////////////////////////////////////////////////////////
     	//Utility
+		scopeToggler.startLoop(); // Must be first line in periodic
     	log(timer.get());
     	if(driver.getBackButton())
     	{
@@ -162,7 +194,7 @@ public class Robot extends IterativeRobot
     	{
     		fieldOrient = !fieldOrient;
     	}
-    	drive.swerve(-x,-y,-twist,0,fieldOrient);
+    	drive.swerve(-x,-y,-twist,-navx.getAngle(),fieldOrient);
     	///////////////////////////////////////////////////////////////////////////
     	//Climber
     	if(driver.getTriggerAxis(Hand.kRight) > 0.1)
@@ -185,14 +217,60 @@ public class Robot extends IterativeRobot
     	}
     	else
     	{
-    		gear.stop();
+ //   		gear.stop();
     	}
+    	///////////////////////////////////////////////////////////////////////////
+    	//Manipulation
+    	if(collection.Check(driver.getXButton()))
+    	{
+    		collect = !collect;
+    	}
+    	
+    	if(collect)
+    	{
+			manip.setInput(isCompetition() ? -0.7 : 0.7, isCompetition() ? 0.6 : -0.6);
+    	}
+    	else
+    	{
+    		manip.setInput(0, 0);
+    	}
+    	
+    	if(driver.getPOV() == 0)
+    	{
+    		carousel.forward();
+    	}
+    	else if(driver.getPOV() == 180)
+    	{
+    		carousel.reverse();
+    	}
+    	else
+    	{
+    		carousel.stop();
+    	}
+    	///////////////////////////////////////////////////////////////////////////
+    	//Shooter
+    	if(driver.getAButton())
+    	{
+    		shooter.shoot();
+    	}
+    	else
+    	{
+    		shooter.stop();
+    	}
+    	
+    	if(driver.getYButton())
+    	{
+    		ReloadConfig();
+    	}
+    	
+    	scopeToggler.endLoop();
 	}
 //========================================================================================================
 	@Override
 	public void testInit()
 	{
 		setupPeriodic("test");
+		System.gc();
 	}
 
 	@Override
@@ -208,11 +286,17 @@ public class Robot extends IterativeRobot
     	if(driver.getStartButton())
     	{
     		maxEncValue = drive.calibrateAngle();
-    		for(double x: maxEncValue)
+    		for(double[] x: maxEncValue)
     		{
-    			System.out.println(x);
+    			System.out.println("Min: " + x[0] + "\tMax: " + x[1]);
     		}
     	}
+	}
+	
+	@Override
+	public void disabledInit()
+	{
+		System.gc();
 	}
 //========================================================================================================
 	public void setupPeriodic(String period)
@@ -250,6 +334,8 @@ public class Robot extends IterativeRobot
 		logger.addLoggable(drive);
 		logger.addLoggable(navx);
 		logger.addLoggable(gear);
+		logger.addLoggable(shooter);
+		logger.addLoggable(carousel);
 		logger.setupLoggables();
 		logger.writeAttributes();
 	}
@@ -266,8 +352,14 @@ public class Robot extends IterativeRobot
 	void ReloadConfig()
 	{
 		Config.loadFromFile("/home/lvuser/config.txt");
+		Config.reloadConfig();
 		//autoAimOffset = Config.getSetting("autoAimOffest", 0);
 		drive.ReloadConfig();
+	}
+	
+	public static boolean isCompetition()
+	{
+		return new File("/home/lvuser/comp.txt").exists();
 	}
 }
 

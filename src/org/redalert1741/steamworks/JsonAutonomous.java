@@ -35,6 +35,10 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	private final double TICKS_PER_ROTATION = 533.4;
 	private final double TICKS_PER_INCH = TICKS_PER_ROTATION / (4 * Math.PI);
 	
+	private FileReader fr;
+	private JsonReader jr;
+	private JsonParser jp;
+	
 	private enum Unit { Seconds, Milliseconds, EncoderTicks, Rotations, Inches, Feet, Degrees, Invalid };
 	
 	private static class AutoInstruction
@@ -70,6 +74,17 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		straighten.setAbsoluteTolerance(0);
 		straighten.setContinuous(true);
 		
+		turn.setPID(Config.getSetting("auto_turn_p", 0.02), 
+				Config.getSetting("auto_turn_i", 0.00001),
+				Config.getSetting("auto_turn_d", 0));
+		straighten.setPID(Config.getSetting("auto_straight_p", 0.2), 
+				Config.getSetting("auto_straight_i", 0),
+				Config.getSetting("auto_straight_d", 0));
+		parseFile(file);
+	}
+	
+	public void parseFile(String file)
+	{
 		reloadConfig();
 		
 		step = -1;
@@ -78,7 +93,11 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		try
 		{
 			//System.out.println(new File(file).exists());
-			auto = new JsonParser().parse(new JsonReader(new FileReader(new File(file))));
+			fr = new FileReader(new File(file));
+			jr = new JsonReader(fr);
+			jp = new JsonParser();
+			auto = jp.parse(jr);
+			//auto = new JsonParser().parse(new JsonReader(new FileReader(new File(file))));
 			JsonElement inner = auto.getAsJsonObject().get("auto");
 			if(inner.isJsonArray())
 			{
@@ -120,11 +139,15 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		AutoInstruction ai = instructions.get(step);
 		if(ai.type.equals("drive"))
 		{
-			drive(ai);
+			drive(ai, false);
 		}
 		else if(ai.type.equals("drive-t"))
 		{
 			driveTranslation(ai);
+		}
+		else if(ai.type.equals("drive-fo"))
+		{
+			driveFieldOriented(ai);
 		}
 		else if(ai.type.equals("drive-r"))
 		{
@@ -153,11 +176,11 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	 * @param t Time to drive
 	 * @return Whether drive has completed
 	 */
-	private boolean driveTime(double x, double y, double z, double t)
+	private boolean driveTime(double x, double y, double z, double t, boolean fieldOrient)
 	{
 		if(timer.get() < t)
 		{
-			Robot.drive.swerveAbsolute(x, y, z, Robot.navx.getAngle()-navxStart, false);
+			Robot.drive.swerveAbsolute(x, y, 0,-Robot.navx.getAngle()+navxStart, fieldOrient);
 		}
 		else
 		{
@@ -166,11 +189,11 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		return false;
 	}
 	
-	private boolean driveDistance(double x, double y, double z, double a)
+	private boolean driveDistance(double x, double y, double z, double a, boolean fieldOrient)
 	{
 		if(Robot.drive.FRM.getDriveEnc()-start < a)
 		{
-			Robot.drive.swerveAbsolute(x, y, z, -(Robot.navx.getAngle()-navxStart), false);
+			Robot.drive.swerveAbsolute(x, y, 0, -Robot.navx.getAngle()+navxStart, fieldOrient);
 		}
 		else
 		{
@@ -188,7 +211,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	private boolean rotateDegrees(double speed, double amt)
 	{
 		turnSpeed = turn.get();
-		if(Math.abs(turnSpeed) < 0.01 && turnSpeed != 0) { return true; }
+		if(Math.abs(Robot.navx.getAngle()-navxStart-amt) < 0.5) { return true; }
 		Robot.drive.swerveAbsolute(0, 0, -turnSpeed, Robot.navx.getAngle(), false);
 		return false;
 	}
@@ -218,6 +241,25 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	}
 	
 	/**
+	 * Drives in a straight line while maintaining current rotation and also field oriented
+	 * @see AutoInstruction
+	 * @param ai AutoInstruction to use
+	 */
+	public void driveFieldOriented(AutoInstruction ai)
+	{
+		//System.out.println("Drive Translation: x: " + ai.args.get(0) + ", y: " + ai.args.get(1));
+		if(ai.args.size() == 3)
+		{
+			ai.args.set(2, 0.0);
+		}
+		else
+		{
+			ai.args.add(0.0);
+		}
+		drive(ai, true);
+	}
+	
+	/**
 	 * Drives in a straight line while maintaining current rotation
 	 * @see AutoInstruction
 	 * @param ai AutoInstruction to use
@@ -239,7 +281,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		{
 			ai.args.add(-straighten.get());
 		}
-		drive(ai);
+		drive(ai, false);
 	}
 	
 	/**
@@ -268,29 +310,28 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	 * Processes a three-argument drive instruction 
 	 * @param ai
 	 */
-	public void drive(AutoInstruction ai)
+	public void drive(AutoInstruction ai, boolean fieldOrient)
 	{
 		//System.out.println("Drive x: " + ai.args.get(0) + ", y: " + ai.args.get(1) + ", z: " + ai.args.get(2) + ", " + ai.amount + " " + ai.unit);
 		System.out.println(ai.args.get(2));
 		Unit u = ai.unit;
 		if(u.equals(Unit.Seconds) || u.equals(Unit.Milliseconds))
 		{
-			if(driveTime(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.Seconds) ? ai.amount : ai.amount/1000.0)))
+			if(driveTime(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.Seconds) ? ai.amount : ai.amount/1000.0), fieldOrient))
 			{
 				reset();
 			}
 		}
 		else if(u.equals(Unit.EncoderTicks) || u.equals(Unit.Rotations))
 		{
-			if(driveDistance(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.EncoderTicks) ? ai.amount : ai.amount*TICKS_PER_ROTATION)))
+			if(driveDistance(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.EncoderTicks) ? ai.amount : ai.amount*TICKS_PER_ROTATION), fieldOrient))
 			{
 				reset();
 			}
 		}
 		else if(u.equals(Unit.Feet) || u.equals(Unit.Inches))
-		{
-			
-			if(driveDistance(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.Inches) ? ai.amount*TICKS_PER_INCH : (ai.amount*TICKS_PER_INCH))*12.0))
+		{	
+			if(driveDistance(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.Inches) ? ai.amount*TICKS_PER_INCH : (ai.amount*TICKS_PER_INCH))*12.0, fieldOrient))
 			{
 				reset();
 			}
@@ -306,8 +347,8 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	@Override
 	public void reloadConfig()
 	{
-		turn.setPID(Config.getSetting("auto_turn_p", 0.2), 
-				Config.getSetting("auto_turn_i", 0),
+		turn.setPID(Config.getSetting("auto_turn_p", 0.02), 
+				Config.getSetting("auto_turn_i", 0.00001),
 				Config.getSetting("auto_turn_d", 0));
 		straighten.setPID(Config.getSetting("auto_straight_p", 0.2), 
 				Config.getSetting("auto_straight_i", 0),

@@ -13,14 +13,16 @@ public class GearPlacer implements Loggable,Configurable
 {
 	Spark M;
 	GearPlacerState state;
-	double motorSpeed;
+	double motorSpeedOpen;
+	double motorSpeedClose;
 
 	
 	public GearPlacer(int m)
 	{
 		state = GearPlacerState.Waiting;
 		M = new Spark(m);
-		motorSpeed = Config.getSetting("gearMotorSpeed", 0.3);
+		motorSpeedOpen = Config.getSetting("gearMotorSpeedOpen", .4);
+		motorSpeedClose = Config.getSetting("gearMotorSpeedClose", 0.25);
 	}
 	
 	public enum GearPlacerState
@@ -84,13 +86,13 @@ public class GearPlacer implements Loggable,Configurable
 	
 	public void open()
 	{
-		M.set(motorSpeed);
+		M.set(motorSpeedOpen);
 		state = GearPlacerState.Opening;
 	}
 	
 	public void close()
 	{
-		M.set(-motorSpeed);
+		M.set(-motorSpeedClose);
 		state = GearPlacerState.Closing;
 	}
 

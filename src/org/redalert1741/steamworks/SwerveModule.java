@@ -16,7 +16,7 @@ public class SwerveModule implements Loggable
 {
 	private double SteerP,SteerI,SteerD;
 	private double SpeedP,SpeedI,SpeedD;
-	private double SteerSpeed,SteerTolerance,SteerEncMax;
+	private double SteerSpeed,SteerTolerance,SteerEncMax,SteerEncMin;
 	private double SteerOffset;
 	private double MaxRPM;
 	
@@ -38,25 +38,26 @@ public class SwerveModule implements Loggable
 		SteerTolerance = Config.getSetting("SteeringTolerance", .25);
 		SteerSpeed = Config.getSetting("SteerSpeed", 1);
 		SteerEncMax = Config.getSetting("SteerEncMax",4.792);
+		SteerEncMax = Config.getSetting("SteerEncMin",0.01);
 		SteerOffset = Config.getSetting("SteerEncOffset",0);
 		MaxRPM = Config.getSetting("driveCIMmaxRPM", 4200);
 		
 		drive = d;
 		drive.setPID(SpeedP, SpeedI, SpeedD);
 		drive.setFeedbackDevice(FeedbackDevice.QuadEncoder);
-    	drive.configEncoderCodesPerRev(20);
-    	drive.enable();
+    drive.configEncoderCodesPerRev(20);
+    drive.enable();
 		
 		angle = a;
 		
 		encoder = e;
 		
-		encFake = new FakePIDSource(SteerOffset,0,SteerEncMax);
+		encFake = new FakePIDSource(SteerOffset,SteerEncMin,SteerEncMax);
 		
 		PIDc = new PIDController(SteerP,SteerI,SteerD,encFake,angle);
 		PIDc.disable();
 		PIDc.setContinuous(true);
-		PIDc.setInputRange(0,SteerEncMax);
+		PIDc.setInputRange(SteerEncMin,SteerEncMax);
 		PIDc.setOutputRange(-SteerSpeed,SteerSpeed);
 		PIDc.setPercentTolerance(SteerTolerance);
 		PIDc.setSetpoint(2.4);
@@ -117,12 +118,13 @@ public class SwerveModule implements Loggable
 	
 	public void setAngle(double angle)
 	{
-		PIDc.setSetpoint(angle*(SteerEncMax/360.0f));
+		PIDc.setSetpoint(angle*((SteerEncMax-SteerEncMin)/360.0f));
 	}
 	
-	public double calibrateAngle() 
+	public double[] calibrateAngle() 
 	{
 		double max = 0;
+		double min = 10;
 		Timer t = new Timer();
 		t.reset();
 		t.start();
@@ -151,10 +153,14 @@ public class SwerveModule implements Loggable
 			{
 				max = encoder.getVoltage();
 			}
+			if(encoder.getVoltage() < min)
+			{
+				min = encoder.getVoltage();
+			}
 		}
 		angle.set(0);
 		angle.setControlMode(0);
-		return max;
+		return new double[] {min,max};
 	}
 	
 	@Override
@@ -202,8 +208,9 @@ public class SwerveModule implements Loggable
 		SteerTolerance = Config.getSetting("SteeringTolerance", 0.25);
 		SteerSpeed = Config.getSetting("SteerSpeed", 1);
 		SteerEncMax = Config.getSetting("SteerEncMax" + s,4.792);
-		PIDc.setInputRange(0,SteerEncMax);
-		encFake.setMinMax(0, SteerEncMax);
+		SteerEncMin = Config.getSetting("SteerEncMin" + s,0.01);
+		PIDc.setInputRange(SteerEncMin,SteerEncMax);
+		encFake.setMinMax(SteerEncMin, SteerEncMax);
 		PIDc.setOutputRange(-SteerSpeed,SteerSpeed);
 		PIDc.setPercentTolerance(SteerTolerance);
 	/////////////////////////////////////////////////////
@@ -214,5 +221,15 @@ public class SwerveModule implements Loggable
 	public double getDriveEnc()
 	{
 		return drive.getEncPosition();
+	}
+
+	public void setBrake() 
+	{
+		drive.enableBrakeMode(true);
+	}
+	
+	public void setCoast()
+	{
+		drive.enableBrakeMode(false);
 	}
 }
