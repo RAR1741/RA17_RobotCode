@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 
+import edu.wpi.cscore.AxisCamera;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.VideoSource;
 
@@ -96,5 +97,13 @@ public class VisionThread
 		{
 			return pipeline.findContoursOutput();
 		}
+	}
+	
+	/**
+	 * Use Axis Camera "axis-1741.local"
+	 */
+	public static void useAxisCamera()
+	{
+		setSource(new AxisCamera("camera1", "axis-1741.local"));
 	}
 }
