@@ -48,6 +48,9 @@ public class VisionThread
 		public void stop() { run = false; }
 	}
 	
+	/**
+	 * Enables/restarts the vision tracking thread
+	 */
 	public static void enable()
 	{
 		init();
@@ -56,6 +59,9 @@ public class VisionThread
 		thread.start();
 	}
 	
+	/**
+	 * Disables the vision tracking thread
+	 */
 	public static void disable()
 	{
 		if(vision != null)
@@ -69,6 +75,9 @@ public class VisionThread
 		}
 	}
 	
+	/**
+	 * Init things that can be null
+	 */
 	private static void init()
 	{
 		if(pipeline == null)
@@ -81,6 +90,11 @@ public class VisionThread
 		}
 	}
 	
+	/**
+	 * Sets the filter to use
+	 * @see VisionFilter
+	 * @param vf Filter to use
+	 */
 	public static void setFilter(VisionFilter vf)
 	{
 		filter = vf;
@@ -110,6 +124,10 @@ public class VisionThread
 		}
 	}
 	
+	/**
+	 * Converts the output of {@link #getContours()} to Rects
+	 * @return Current contours as Rects
+	 */
 	public static ArrayList<Rect> getRekt()
 	{
 		ArrayList<Rect> rekt = new ArrayList<>();
@@ -120,11 +138,20 @@ public class VisionThread
 		return rekt;
 	}
 	
+	/**
+	 * Filters all Rects using current {@link VisionFilter}
+	 * @see #getRekt()
+	 * @return Rects filtered by the current filter or all of the Rects if there is none
+	 */
 	public static ArrayList<Rect> filterRekts()
 	{
-		return filter == null ? new ArrayList<Rect>() : filter.getFilteredRects(getRekt());
+		return filter == null ? getRekt() : filter.getFilteredRects(getRekt());
 	}
 	
+	/**
+	 * Finds the best Rect from {@link #getRekt()} using the current {@link VisionFilter}
+	 * @return The best Rect or null if no filter is set
+	 */
 	public static Rect getBestRekt()
 	{
 //		ArrayList<Rect> rekt = getRekt();
@@ -146,7 +173,7 @@ public class VisionThread
 //		}
 		return filter == null ? null : filter.getBestRect(getRekt());
 	}
-	
+
 	public static double getHorizontalAngle(Rect bestRect)
 	{
 		Mat matthew = new Mat();
