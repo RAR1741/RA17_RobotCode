@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.redalert1741.robotBase.config.Config;
 
 import edu.wpi.cscore.AxisCamera;
 import edu.wpi.cscore.CvSink;
@@ -100,10 +101,10 @@ public class VisionThread
 	}
 	
 	/**
-	 * Use Axis Camera "axis-1741.local"
+	 * Use Axis Camera "axis1741.local" by default and Setting "visionCamera"
 	 */
 	public static void useAxisCamera()
 	{
-		setSource(new AxisCamera("camera1", "axis-1741.local"));
+		setSource(new AxisCamera("camera1", Config.getSetting("visionCamera", "axis1741.local")));
 	}
 }
