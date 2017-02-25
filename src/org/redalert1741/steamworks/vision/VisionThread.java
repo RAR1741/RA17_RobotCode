@@ -20,6 +20,7 @@ public class VisionThread
 	private static CvSink cvs;
 	private static VideoSource source;
 	private static Object lock;
+	private static VisionFilter filter;
 	
 	public static class VisionRunnable implements Runnable
 	{
@@ -78,6 +79,11 @@ public class VisionThread
 		}
 	}
 	
+	public static void setFilter(VisionFilter vf)
+	{
+		filter = vf;
+	}
+	
 	/**
 	 * Sets the video source
 	 * @see AxisCamera
@@ -112,35 +118,37 @@ public class VisionThread
 		return rekt;
 	}
 	
-	public static ArrayList<Rect> filterRekts(double aspectR)
+	public static ArrayList<Rect> filterRekts()
 	{
-		
+		return filter == null ? new ArrayList<Rect>() : filter.getFilteredRects(getRekt());
 	}
 	
 	public static Rect getBestRekt()
 	{
-		ArrayList<Rect> rekt = getRekt();
-		Rect bestRekt = rekt.get(0);
-		if(!(rekt.isEmpty()))
-		{
-			for(Rect r : rekt)
-			{
-				if(r.tl().y < bestRekt.tl().y)
-				{
-					bestRekt = r;
-				}
-			}
-			return bestRekt;
-		}
-		else
-		{
-			return null;
-		}
+//		ArrayList<Rect> rekt = getRekt();
+//		Rect bestRekt = rekt.get(0);
+//		if(!(rekt.isEmpty()))
+//		{
+//			for(Rect r : rekt)
+//			{
+//				if(r.tl().y < bestRekt.tl().y)
+//				{
+//					bestRekt = r;
+//				}
+//			}
+//			return bestRekt;
+//		}
+//		else
+//		{
+//			return null;
+//		}
+		return filter == null ? null : filter.getBestRect(getRekt());
 	}
 	
 	public static double getHorizontalAngle()
 	{
-		
+		//TODO please please fix this
+		return 5;
 	}
 	
 	/**
