@@ -174,8 +174,15 @@ public class VisionThread
 		return filter == null ? null : filter.getBestRect(getRekt());
 	}
 
-	public static double getHorizontalAngle(Rect bestRect)
+	/**
+	 * Calculates current horizontal angle to the best Rect
+	 * @see #getRekt()
+	 * @see #getBestRekt()
+	 * @return angle to best Rect
+	 */
+	public static double getHorizontalAngle()
 	{
+		Rect bestRect = getBestRekt();
 		Mat matthew = new Mat();
 		cvs.grabFrame(matthew);
 		double x = bestRect.br().x - (bestRect.width / 2);
