@@ -199,16 +199,10 @@ public class Robot extends IterativeRobot
     	drive.swerve(-x,-y,-twist,-navx.getAngle(),fieldOrient);
     	///////////////////////////////////////////////////////////////////////////
     	//Climber
-    	if(driver.getTriggerAxis(Hand.kRight) > 0.1 || op.getTriggerAxis(Hand.kRight) > 0.1)
+    	double trigger = Math.max(driver.getTriggerAxis(Hand.kRight), op.getTriggerAxis(Hand.kRight));
+    	if(trigger >= Config.getSetting("TriggerThreshold", 0.1))
     	{
-    		if(driver.getTriggerAxis(Hand.kRight) > op.getTriggerAxis(Hand.kRight))
-    		{
-    			climber.climb(driver.getTriggerAxis(Hand.kRight));
-    		}
-    		else
-    		{
-    			climber.climb(op.getTriggerAxis(Hand.kRight));
-    		}
+    		climber.climb(trigger);
     	}
     	else
     	{
