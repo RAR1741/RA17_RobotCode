@@ -1,4 +1,4 @@
-package org.redalert1741.steamworks;
+package org.redalert1741.steamworks.vision;
 
 import java.util.ArrayList;
 
@@ -110,6 +110,37 @@ public class VisionThread
 			rekt.add(Imgproc.boundingRect(mop));
 		}
 		return rekt;
+	}
+	
+	public static ArrayList<Rect> filterRekts(double aspectR)
+	{
+		
+	}
+	
+	public static Rect getBestRekt()
+	{
+		ArrayList<Rect> rekt = getRekt();
+		Rect bestRekt = rekt.get(0);
+		if(!(rekt.isEmpty()))
+		{
+			for(Rect r : rekt)
+			{
+				if(r.tl().y < bestRekt.tl().y)
+				{
+					bestRekt = r;
+				}
+			}
+			return bestRekt;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public static double getHorizontalAngle()
+	{
+		
 	}
 	
 	/**

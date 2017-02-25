@@ -1,4 +1,4 @@
-package org.redalert1741.steamworks;
+package org.redalert1741.steamworks.vision;
 
 import java.util.ArrayList;
 import java.util.List;
