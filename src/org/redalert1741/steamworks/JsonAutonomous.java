@@ -232,7 +232,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	}
 	
 	/**
-	 * Processes gear WIP
+	 * Processes gear
 	 * @param ai
 	 */
 	public void gear(AutoInstruction ai)
