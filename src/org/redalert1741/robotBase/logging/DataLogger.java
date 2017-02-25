@@ -1,7 +1,7 @@
 package org.redalert1741.robotBase.logging;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
 public class DataLogger 
 {
 	private String filename;
-	private PrintWriter log = null;
+	private FileWriter log = null;
 	private Map<String, String> fields;
 	private List<Loggable> loggables;
 	private NetworkTable table;
@@ -33,9 +33,9 @@ public class DataLogger
 		this.filename = filename;
 		try
 		{
-			log = new PrintWriter(filename);
+			log = new FileWriter(filename);
 		}
-		catch (FileNotFoundException e)
+		catch (IOException e)
 		{
 			return false;
 		}
@@ -46,7 +46,14 @@ public class DataLogger
 	{
 		if(log!=null)
 		{
-			log.close();
+			try
+			{
+				log.close();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -114,22 +121,38 @@ public class DataLogger
 
 	public boolean writeAttributes()
 	{
-		for (Map.Entry<String,String> e : fields.entrySet())
+		try
 		{
-			log.print(e.getKey() + ',');
+			for (Map.Entry<String,String> e : fields.entrySet())
+			{
+				log.write(e.getKey() + ',');
+			}
+			log.write("\n");
+			log.flush();
 		}
-		log.println();
-		return !log.checkError();
+		catch (IOException e1)
+		{
+			e1.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 	public boolean writeLine()
 	{
-		for (Map.Entry<String,String> e : fields.entrySet())
+		try
 		{
-			log.print(e.getValue() + ',');
+			for (Map.Entry<String,String> e : fields.entrySet())
+			{
+				log.write(e.getValue() + ',');
+			}
+			log.write("\n");
 		}
-		log.println();
-		return !log.checkError();
+		catch (IOException e)
+		{
+			return false;
+		}
+		return true;
 	}
 
 	String Normalize(String str)

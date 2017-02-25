@@ -34,6 +34,7 @@ public class Robot extends IterativeRobot
 	public static Carousel carousel;
 	
 	private static XboxController driver;
+	private static XboxController op;
 	private static EdgeDetect driveMode;
 	private static EdgeDetect collection;
 	
@@ -99,6 +100,7 @@ public class Robot extends IterativeRobot
 		drive = new SwerveDrive(FR, FRa, FRe, FL, FLa, FLe, BR, BRa, BRe, BL, BLa, BLe);
 		////////////////////////////////////////////////
 		driver = new XboxController(4);
+		op = new XboxController(0);
 		////////////////////////////////////////////////
 		driveMode = new EdgeDetect();
 		collection = new EdgeDetect();
@@ -197,9 +199,10 @@ public class Robot extends IterativeRobot
     	drive.swerve(-x,-y,-twist,-navx.getAngle(),fieldOrient);
     	///////////////////////////////////////////////////////////////////////////
     	//Climber
-    	if(driver.getTriggerAxis(Hand.kRight) > 0.1)
+    	double trigger = Math.max(driver.getTriggerAxis(Hand.kRight), op.getTriggerAxis(Hand.kRight));
+    	if(trigger >= Config.getSetting("TriggerThreshold", 0.1))
     	{
-    		climber.climb(driver.getTriggerAxis(Hand.kRight));
+    		climber.climb(trigger);
     	}
     	else
     	{
@@ -207,11 +210,11 @@ public class Robot extends IterativeRobot
     	}
     	///////////////////////////////////////////////////////////////////////////
     	//Gear
-    	if(driver.getBumper(Hand.kLeft))
+    	if(driver.getBumper(Hand.kLeft) || op.getBumper(Hand.kLeft))
     	{
     		gear.close();
     	}
-    	else if(driver.getBumper(Hand.kRight))
+    	else if(driver.getBumper(Hand.kRight) || op.getBumper(Hand.kRight))
     	{
     		gear.open();
     	}
@@ -221,25 +224,25 @@ public class Robot extends IterativeRobot
     	}
     	///////////////////////////////////////////////////////////////////////////
     	//Manipulation
-    	if(collection.Check(driver.getXButton()))
+    	if(collection.Check(driver.getXButton() || op.getXButton()))
     	{
     		collect = !collect;
     	}
     	
     	if(collect)
     	{
-			manip.setInput(isCompetition() ? -0.7 : 0.7, isCompetition() ? 0.6 : -0.6);
+			manip.setInput(isCompetition() ? -1 : 1, isCompetition() ? 0.7 : -1);
     	}
     	else
     	{
     		manip.setInput(0, 0);
     	}
     	
-    	if(driver.getPOV() == 0)
+    	if(driver.getPOV() == 0 || op.getPOV() == 0)
     	{
     		carousel.forward();
     	}
-    	else if(driver.getPOV() == 180)
+    	else if(driver.getPOV() == 180 || op.getPOV() == 180)
     	{
     		carousel.reverse();
     	}
@@ -249,7 +252,7 @@ public class Robot extends IterativeRobot
     	}
     	///////////////////////////////////////////////////////////////////////////
     	//Shooter
-    	if(driver.getAButton())
+    	if(driver.getAButton() || op.getAButton())
     	{
     		shooter.shoot();
     	}
@@ -313,7 +316,8 @@ public class Robot extends IterativeRobot
 		String robot = !(Config.getSetting("isPrototype", 0) == 0) ? "_proto" : "_comp";
 		l.close();
 		Calendar calendar = Calendar.getInstance();
-		String dir = "/home/lvuser";
+		String dir = "/home/lvuser/logs";
+		new File(dir).mkdirs();
 		if(new File("/media/sda").exists())
 		{
 			dir = "/media/sda";
