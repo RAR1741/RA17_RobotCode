@@ -1,5 +1,10 @@
 package org.redalert1741.steamworks;
 
+import java.util.ArrayList;
+
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.VideoSource;
 
@@ -10,6 +15,7 @@ public class VisionThread
 	private static GripPipeline pipeline;
 	private static CvSink cvs;
 	private static VideoSource source;
+	private static Object lock;
 	
 	public static class VisionRunnable implements Runnable
 	{
@@ -21,7 +27,14 @@ public class VisionThread
 			run = true;
 			while(run)
 			{
-				//TODO vision
+				Mat matthew = new Mat();
+				cvs.grabFrame(matthew);
+				synchronized (lock)
+				{
+					pipeline.process(matthew);
+				}
+				matthew.release();
+				Thread.yield();
 			}
 		}
 		
@@ -71,5 +84,17 @@ public class VisionThread
 		source = s;
 		init();
 		cvs.setSource(source);
+	}
+	
+	/**
+	 * Gets list of MatOfPoints from contoursReport
+	 * @return contoursReport
+	 */
+	public static ArrayList<MatOfPoint> getContours()
+	{
+		synchronized (lock)
+		{
+			return pipeline.findContoursOutput();
+		}
 	}
 }
