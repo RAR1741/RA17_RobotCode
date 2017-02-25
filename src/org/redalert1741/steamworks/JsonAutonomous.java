@@ -237,7 +237,14 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	 */
 	public void gear(AutoInstruction ai)
 	{
-		//System.out.println("Gear " + (ai.args.get(0)==1?"open":"close"));
+		if(ai.args.get(0) == 1)
+		{
+			Robot.gear.open();
+		}
+		else
+		{
+			Robot.gear.close();
+		}
 	}
 	
 	/**
