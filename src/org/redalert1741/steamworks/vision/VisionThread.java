@@ -192,6 +192,16 @@ public class VisionThread
 		return HORIZONTAL_CAMERA_ANGLE-(x*HORIZONTAL_FOV /2.0);
 	}
 	
+	public static double getWidthBestRekt()
+	{
+		return getBestRekt().width;
+	}
+	
+	public static int getHeightBestRekt()
+	{
+		return getBestRekt().height;
+	}
+	
 	/**
 	 * Use Axis Camera "axis1741.local" by default and Setting "visionCamera"
 	 */
