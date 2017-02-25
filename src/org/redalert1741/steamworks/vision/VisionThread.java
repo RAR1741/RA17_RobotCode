@@ -14,6 +14,8 @@ import edu.wpi.cscore.VideoSource;
 
 public class VisionThread
 {
+	private static final int HORIZONTAL_CAMERA_ANGLE = (int) Config.getSetting("HorizontalCameraAngle", 0);
+	private static final double HORIZONTAL_FOV = (int) Config.getSetting("HorizontalFOV", 49);
 	private static Thread thread;
 	private static VisionRunnable vision;
 	private static GripPipeline pipeline;
@@ -145,10 +147,15 @@ public class VisionThread
 		return filter == null ? null : filter.getBestRect(getRekt());
 	}
 	
-	public static double getHorizontalAngle()
+	public static double getHorizontalAngle(Rect bestRect)
 	{
-		//TODO please please fix this
-		return 5;
+		Mat matthew = new Mat();
+		cvs.grabFrame(matthew);
+		double x = bestRect.br().x - (bestRect.width / 2);
+//		Set x to +/- 1 using the position on the screen
+		x = ((2 * (x / matthew.width())) - 1);
+		matthew.release();
+		return HORIZONTAL_CAMERA_ANGLE-(x*HORIZONTAL_FOV /2.0);
 	}
 	
 	/**
