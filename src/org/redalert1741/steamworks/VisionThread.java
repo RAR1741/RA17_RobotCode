@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Rect;
+import org.opencv.imgproc.Imgproc;
 import org.redalert1741.robotBase.config.Config;
 
 import edu.wpi.cscore.AxisCamera;
@@ -98,6 +100,16 @@ public class VisionThread
 		{
 			return pipeline.findContoursOutput();
 		}
+	}
+	
+	public static ArrayList<Rect> getRekt()
+	{
+		ArrayList<Rect> rekt = new ArrayList<>();
+		for(MatOfPoint mop : getContours())
+		{
+			rekt.add(Imgproc.boundingRect(mop));
+		}
+		return rekt;
 	}
 	
 	/**
