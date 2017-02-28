@@ -186,11 +186,11 @@ public class Robot extends IterativeRobot
     	twist = driver.getX(Hand.kRight);
     	
     	if(x >= -0.05 && x <= 0.05){x=0;}
-    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { x=0.5*x; }
+    	else if(!(driver.getBumper(Hand.kRight) > 0.5)) { x=0.5*x; }
     	if(y >= -0.05 && y <= 0.05){y=0;}
-    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { y=0.5*y; }
+    	else if(!(driver.getBumper(Hand.kRight) > 0.5)) { y=0.5*y; }
     	if(twist >= -0.05 && twist <= 0.05){twist=0;}
-    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { twist=0.5*twist; }
+    	else if(!(driver.getBumper(Hand.kRight) > 0.5)) { twist=0.5*twist; }
     	else { twist=0.8*twist; }
     	if(driveMode.Check(driver.getStartButton()))
     	{
@@ -212,15 +212,11 @@ public class Robot extends IterativeRobot
     	//Gear
     	if(driver.getBumper(Hand.kLeft) || op.getBumper(Hand.kLeft))
     	{
-    		gear.close();
-    	}
-    	else if(driver.getBumper(Hand.kRight) || op.getBumper(Hand.kRight))
-    	{
     		gear.open();
     	}
     	else
     	{
- //   		gear.stop();
+    		gear.close();
     	}
     	///////////////////////////////////////////////////////////////////////////
     	//Manipulation
