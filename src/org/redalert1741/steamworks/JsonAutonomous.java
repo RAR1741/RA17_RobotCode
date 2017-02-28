@@ -157,6 +157,10 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		{
 			gear(ai);
 		}
+		else if(ai.type.equals("brake"))
+		{
+			brake();
+		}
 		else if(ai.type.equals("wait"))
 		{
 			Robot.drive.swerveAbsolute(0, 0, 0, 0, false);
@@ -229,6 +233,19 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		start = Robot.drive.FRM.getDriveEnc();
 		navxStart = Robot.navx.getAngle();
 		edge = true;
+	}
+	
+	/**
+	 * Stop the Robit and wait for a time
+	 * @param ai
+	 */
+	public void brake(AutoInstruction ai)
+	{
+		Robot.drive.setBrake();
+		if(timer.get() > ai.args.get(0))
+		{
+			Robot.drive.setCoast();
+		}
 	}
 	
 	/**
