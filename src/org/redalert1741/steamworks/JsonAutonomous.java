@@ -159,7 +159,11 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		}
 		else if(ai.type.equals("brake"))
 		{
-			brake();
+			brake(ai);
+		}
+		else if(ai.type.equals("turnWheels"))
+		{
+			turnWheels(ai);
 		}
 		else if(ai.type.equals("wait"))
 		{
@@ -228,6 +232,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		turn.disable();
 		straighten.disable();
 		step++;
+		Robot.drive.swerveAbsolute(0, 0, 0, 0, false);
 		timer.reset();
 		timer.start();
 		start = Robot.drive.FRM.getDriveEnc();
@@ -241,10 +246,25 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	 */
 	public void brake(AutoInstruction ai)
 	{
+		Robot.drive.swerveAbsolute(0, 0, 0, 0, false);
 		Robot.drive.setBrake();
 		if(timer.get() > ai.args.get(0))
 		{
 			Robot.drive.setCoast();
+			reset();
+		}
+	}
+	
+	/**
+	 * turns wheels to position
+	 * @param ai
+	 */
+	public void turnWheels(AutoInstruction ai)
+	{
+		Robot.drive.swerveAbsolute(ai.args.get(0), ai.args.get(1), 0, -Robot.navx.getAngle()+navxStart, true);
+		if(timer.get() > ai.amount)
+		{
+			reset();
 		}
 	}
 	
