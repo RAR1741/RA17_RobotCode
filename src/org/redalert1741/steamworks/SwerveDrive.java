@@ -228,8 +228,8 @@ public class SwerveDrive implements Loggable
 		angleToZero();
 		FRM.setDriveSpeed(right);
 		BRM.setDriveSpeed(right);
-		FLM.setDriveSpeed(left);
-		BLM.setDriveSpeed(left);
+		FLM.setDriveSpeed(-left);
+		BLM.setDriveSpeed(-left);
 	}
 	
 	public void setEncMax(SwerveModule module,double max)

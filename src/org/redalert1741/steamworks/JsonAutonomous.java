@@ -165,6 +165,14 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		{
 			turnWheels(ai);
 		}
+		else if(ai.type.equals("intake"))
+		{
+			intake(ai);
+		}
+		else if(ai.type.equals("tankDrive"))
+		{
+			tankDrive(ai);
+		}
 		else if(ai.type.equals("wait"))
 		{
 			Robot.drive.swerveAbsolute(0, 0, 0, 0, false);
@@ -281,6 +289,31 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		else
 		{
 			Robot.gear.close();
+		}
+		reset();
+	}
+	
+	public void intake(AutoInstruction ai)
+	{
+		Robot.manip.setInput(Robot.isCompetition() ? -1 : 0.6, Robot.isCompetition() ? 0.7 : -0.7);
+		if(timer.get() > ai.args.get(0))
+		{
+			Robot.manip.setInput(0,0);
+			reset();
+		}
+	}
+	
+	public void tankDrive(AutoInstruction ai)
+	{
+		System.out.println("tank");
+		if(Robot.drive.FRM.getDriveEnc()-start < (ai.amount*TICKS_PER_INCH)*12.0)
+		{
+			Robot.drive.tankDrive(ai.args.get(0), ai.args.get(1));
+			System.out.println(ai.args.get(0) + ai.args.get(1));
+		}
+		else
+		{
+			reset();
 		}
 	}
 	
