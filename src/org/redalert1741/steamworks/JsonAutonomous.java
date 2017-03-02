@@ -34,6 +34,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	private boolean edge;
 	private final double TICKS_PER_ROTATION = 533.4;
 	private final double TICKS_PER_INCH = TICKS_PER_ROTATION / (4 * Math.PI);
+	private final double TICKS_PER_DEGREE = TICKS_PER_INCH * 0.30531;
 	
 	private FileReader fr;
 	private JsonReader jr;
@@ -173,6 +174,10 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		{
 			tankDrive(ai);
 		}
+		else if(ai.type.equals("turnDeg"))
+		{
+			turnDegrees(ai);
+		}
 		else if(ai.type.equals("wait"))
 		{
 			Robot.drive.swerveAbsolute(0, 0, 0, 0, false);
@@ -207,7 +212,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	
 	private boolean driveDistance(double x, double y, double z, double a, boolean fieldOrient)
 	{
-		if(Robot.drive.FRM.getDriveEnc()-start < a)
+		if(Math.abs(Robot.drive.FRM.getDriveEnc()-start) < a)
 		{
 			Robot.drive.swerveAbsolute(x, y, 0, -Robot.navx.getAngle()+navxStart, fieldOrient);
 		}
@@ -230,6 +235,19 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		if(Math.abs(Robot.navx.getAngle()-navxStart-amt) < 0.5) { return true; }
 		Robot.drive.swerveAbsolute(0, 0, -turnSpeed, Robot.navx.getAngle(), false);
 		return false;
+	}
+	
+	public void turnDegrees(AutoInstruction ai)
+	{
+		if(Math.abs(Robot.drive.FRM.getDriveEnc()-start) < ai.amount * TICKS_PER_DEGREE)
+		{
+			Robot.drive.swerveAbsolute(0, 0, ai.args.get(0), 0, false);
+		}
+		else
+		{
+			Robot.drive.swerveAbsolute(0, 0, 0, 0, false);
+			reset();
+		}
 	}
 	
 	/**
