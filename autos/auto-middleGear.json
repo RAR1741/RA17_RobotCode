@@ -1,0 +1,12 @@
+{
+        "auto":[
+
+		{"type":"drive-fo","unit":"Feet","amount":6.5,"args":[0,0.2]},
+                {"type":"brake","unit":"Invalid","amount":0.5,"args":[1]},
+                {"type":"gear","unit":"Invalid","amount":1,"args":[1]},
+		{"type":"brake","unit":"Invalid","amount":0.5,"args":[0.5]},
+		{"type":"intake","unit":"Invalid","amount":0.25,"args":[2]},
+		{"type":"drive-fo","unit":"Feet","amount":1,"args":[0,-0.1]}
+        ]
+}
+
