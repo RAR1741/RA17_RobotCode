@@ -10,6 +10,7 @@ import org.redalert1741.robotBase.input.*;
 import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.SPI.Port;
 

@@ -16,9 +16,11 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class JsonAutonomous extends Autonomous implements PIDOutput, Configurable
 {
@@ -31,6 +33,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	private PIDController turn;
 	private PIDController straighten;
 	private double turnSpeed;
+	private boolean red;
 	private boolean edge;
 	private final double TICKS_PER_ROTATION = 533.4;
 	private final double TICKS_PER_INCH = TICKS_PER_ROTATION / (4 * Math.PI);
@@ -39,6 +42,8 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	private FileReader fr;
 	private JsonReader jr;
 	private JsonParser jp;
+	
+	protected DriverStation ap_ds;
 	
 	private enum Unit { Seconds, Milliseconds, EncoderTicks, Rotations, Inches, Feet, Degrees, Invalid };
 	
@@ -63,6 +68,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	 */
 	public JsonAutonomous(String file)
 	{
+		ap_ds = DriverStation.getInstance();
 		turn = new PIDController(0.02, 0, 0, Robot.navx, this);
 		turn.setInputRange(-180, 180);
 		turn.setOutputRange(-0.7, 0.7);
@@ -128,6 +134,16 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	@Override
 	public void run()
 	{
+		Alliance a = ap_ds.getAlliance();
+		if(a == Alliance.Red)
+		{
+			red = true;
+		}
+		else
+		{
+			red = false;
+		}
+		
 		if(step == -1)
 		{
 			reset();
@@ -140,20 +156,20 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		AutoInstruction ai = instructions.get(step);
 		if(ai.type.equals("drive"))
 		{
-			drive(ai, false);
+			drive(ai, false, red);
 		}
 		else if(ai.type.equals("drive-t"))
 		{
-			driveTranslation(ai);
+			driveTranslation(ai, red);
 		}
 		else if(ai.type.equals("drive-fo"))
 		{
-			driveFieldOriented(ai);
+			driveFieldOriented(ai,red);
 		}
-		else if(ai.type.equals("drive-r"))
-		{
-			driveRotation(ai);
-		}
+//		else if(ai.type.equals("drive-r"))
+//		{
+//			driveRotation(ai);
+//		}
 		else if(ai.type.equals("gear"))
 		{
 			gear(ai);
@@ -164,19 +180,19 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		}
 		else if(ai.type.equals("turnWheels"))
 		{
-			turnWheels(ai);
+			turnWheels(ai,red);
 		}
 		else if(ai.type.equals("intake"))
 		{
 			intake(ai);
 		}
-		else if(ai.type.equals("tankDrive"))
-		{
-			tankDrive(ai);
-		}
+//		else if(ai.type.equals("tankDrive"))
+//		{
+//			tankDrive(ai);
+//		}
 		else if(ai.type.equals("turnDeg"))
 		{
-			turnDegrees(ai);
+			turnDegrees(ai, red);
 		}
 		else if(ai.type.equals("wait"))
 		{
@@ -186,6 +202,11 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 				reset();
 			}
 			//System.out.println("Wait " + ai.amount + " " + ai.unit);
+		}
+		else
+		{
+			System.out.println("Invalid Command");
+			reset();
 		}
 	}
 	
@@ -237,11 +258,11 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		return false;
 	}
 	
-	public void turnDegrees(AutoInstruction ai)
+	public void turnDegrees(AutoInstruction ai, boolean r)
 	{
 		if(Math.abs(Robot.drive.FRM.getDriveEnc()-start) < ai.amount * TICKS_PER_DEGREE)
 		{
-			Robot.drive.swerveAbsolute(0, 0, ai.args.get(0), 0, false);
+			Robot.drive.swerveAbsolute(0, 0, r ? -ai.args.get(0) : ai.args.get(0), 0, false);
 		}
 		else
 		{
@@ -285,9 +306,9 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	 * turns wheels to position
 	 * @param ai
 	 */
-	public void turnWheels(AutoInstruction ai)
+	public void turnWheels(AutoInstruction ai, boolean r)
 	{
-		Robot.drive.swerveAbsolute(ai.args.get(0), ai.args.get(1), 0, -Robot.navx.getAngle()+navxStart, true);
+		Robot.drive.swerveAbsolute(ai.args.get(0), r ? -ai.args.get(1) : ai.args.get(1), 0, -Robot.navx.getAngle()+navxStart, true);
 		if(timer.get() > ai.amount)
 		{
 			reset();
@@ -340,7 +361,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	 * @see AutoInstruction
 	 * @param ai AutoInstruction to use
 	 */
-	public void driveFieldOriented(AutoInstruction ai)
+	public void driveFieldOriented(AutoInstruction ai, boolean r)
 	{
 		//System.out.println("Drive Translation: x: " + ai.args.get(0) + ", y: " + ai.args.get(1));
 		if(ai.args.size() == 3)
@@ -351,7 +372,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		{
 			ai.args.add(0.0);
 		}
-		drive(ai, true);
+		drive(ai, true, r);
 	}
 	
 	/**
@@ -359,7 +380,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	 * @see AutoInstruction
 	 * @param ai AutoInstruction to use
 	 */
-	public void driveTranslation(AutoInstruction ai)
+	public void driveTranslation(AutoInstruction ai, boolean r)
 	{
 		//System.out.println("Drive Translation: x: " + ai.args.get(0) + ", y: " + ai.args.get(1));
 		if(edge)
@@ -376,7 +397,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		{
 			ai.args.add(-straighten.get());
 		}
-		drive(ai, false);
+		drive(ai, false, r);
 	}
 	
 	/**
@@ -405,28 +426,28 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	 * Processes a three-argument drive instruction 
 	 * @param ai
 	 */
-	public void drive(AutoInstruction ai, boolean fieldOrient)
+	public void drive(AutoInstruction ai, boolean fieldOrient, boolean r)
 	{
 		//System.out.println("Drive x: " + ai.args.get(0) + ", y: " + ai.args.get(1) + ", z: " + ai.args.get(2) + ", " + ai.amount + " " + ai.unit);
 		System.out.println(ai.args.get(2));
 		Unit u = ai.unit;
 		if(u.equals(Unit.Seconds) || u.equals(Unit.Milliseconds))
 		{
-			if(driveTime(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.Seconds) ? ai.amount : ai.amount/1000.0), fieldOrient))
+			if(driveTime(ai.args.get(0), r ? -ai.args.get(1) : ai.args.get(1), ai.args.get(2), (u.equals(Unit.Seconds) ? ai.amount : ai.amount/1000.0), fieldOrient))
 			{
 				reset();
 			}
 		}
 		else if(u.equals(Unit.EncoderTicks) || u.equals(Unit.Rotations))
 		{
-			if(driveDistance(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.EncoderTicks) ? ai.amount : ai.amount*TICKS_PER_ROTATION), fieldOrient))
+			if(driveDistance(ai.args.get(0), r ? -ai.args.get(1) : ai.args.get(1), ai.args.get(2), (u.equals(Unit.EncoderTicks) ? ai.amount : ai.amount*TICKS_PER_ROTATION), fieldOrient))
 			{
 				reset();
 			}
 		}
 		else if(u.equals(Unit.Feet) || u.equals(Unit.Inches))
 		{	
-			if(driveDistance(ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.Inches) ? ai.amount*TICKS_PER_INCH : (ai.amount*TICKS_PER_INCH))*12.0, fieldOrient))
+			if(driveDistance(ai.args.get(0), r ? -ai.args.get(1) : ai.args.get(1), ai.args.get(2), (u.equals(Unit.Inches) ? ai.amount*TICKS_PER_INCH : (ai.amount*TICKS_PER_INCH))*12.0, fieldOrient))
 			{
 				reset();
 			}
