@@ -111,6 +111,7 @@ public class GearPlacer implements Loggable,Configurable
 	@Override
 	public void reloadConfig() 
 	{
-		Config.getSetting("gearMotorSpeed", 0.3);
+		motorSpeedOpen = Config.getSetting("gearMotorSpeedOpen", .4);
+		motorSpeedClose = Config.getSetting("gearMotorSpeedClose", 0.25);
 	}
 }
