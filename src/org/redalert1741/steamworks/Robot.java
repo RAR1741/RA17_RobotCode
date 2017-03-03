@@ -10,6 +10,7 @@ import org.redalert1741.robotBase.input.*;
 import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.SPI.Port;
 
@@ -138,14 +139,14 @@ public class Robot extends IterativeRobot
 		drive.setBrake();
 		setupPeriodic("auto");
 		drive.angleToZero();
-		auton = new JsonAutonomous("/home/lvuser/auto-test.json");
+		auton = new JsonAutonomous("/home/lvuser/" + Config.getSetting("AutoFile", "none-auto") + ".json");
 		System.gc();
 	}
 
 	@Override
 	public void autonomousPeriodic()
 	{
-//    	log(timer.get());
+    	log(timer.get());
 //		if(timer.get() >= 1 && timer.get() <= 5)
 //		{
 //			drive.swerveAbsolute(0, -.4, 0, 0, false);
@@ -227,7 +228,7 @@ public class Robot extends IterativeRobot
     	
     	if(collect)
     	{
-			manip.setInput(isCompetition() ? -1 : 1, isCompetition() ? 0.7 : -1);
+    		manip.setInput(isCompetition() ? -1 : 0.6, isCompetition() ? 0.7 : -0.7);
     	}
     	else
     	{
