@@ -308,7 +308,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	 */
 	public void turnWheels(AutoInstruction ai, boolean r)
 	{
-		Robot.drive.swerveAbsolute(ai.args.get(0), r ? -ai.args.get(1) : ai.args.get(1), 0, -Robot.navx.getAngle()+navxStart, true);
+		Robot.drive.swerveAbsolute(r ? -ai.args.get(0) : ai.args.get(0), ai.args.get(1), 0, -Robot.navx.getAngle()+navxStart, true);
 		if(timer.get() > ai.amount)
 		{
 			reset();
@@ -433,21 +433,21 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		Unit u = ai.unit;
 		if(u.equals(Unit.Seconds) || u.equals(Unit.Milliseconds))
 		{
-			if(driveTime(ai.args.get(0), r ? -ai.args.get(1) : ai.args.get(1), ai.args.get(2), (u.equals(Unit.Seconds) ? ai.amount : ai.amount/1000.0), fieldOrient))
+			if(driveTime(r ? -ai.args.get(0) : ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.Seconds) ? ai.amount : ai.amount/1000.0), fieldOrient))
 			{
 				reset();
 			}
 		}
 		else if(u.equals(Unit.EncoderTicks) || u.equals(Unit.Rotations))
 		{
-			if(driveDistance(ai.args.get(0), r ? -ai.args.get(1) : ai.args.get(1), ai.args.get(2), (u.equals(Unit.EncoderTicks) ? ai.amount : ai.amount*TICKS_PER_ROTATION), fieldOrient))
+			if(driveDistance(r ? -ai.args.get(0) : ai.args.get(0), ai.args.get(1), ai.args.get(2), (u.equals(Unit.EncoderTicks) ? ai.amount : ai.amount*TICKS_PER_ROTATION), fieldOrient))
 			{
 				reset();
 			}
 		}
 		else if(u.equals(Unit.Feet) || u.equals(Unit.Inches))
 		{	
-			if(driveDistance(ai.args.get(0), r ? -ai.args.get(1) : ai.args.get(1), ai.args.get(2), (u.equals(Unit.Inches) ? ai.amount*TICKS_PER_INCH : (ai.amount*TICKS_PER_INCH))*12.0, fieldOrient))
+			if(driveDistance(r ? -ai.args.get(0) : ai.args.get(0),ai.args.get(1), ai.args.get(2), (u.equals(Unit.Inches) ? ai.amount*TICKS_PER_INCH : (ai.amount*TICKS_PER_INCH))*12.0, fieldOrient))
 			{
 				reset();
 			}

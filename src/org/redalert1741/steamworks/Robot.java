@@ -146,7 +146,7 @@ public class Robot extends IterativeRobot
 	@Override
 	public void autonomousPeriodic()
 	{
-//    	log(timer.get());
+    	log(timer.get());
 //		if(timer.get() >= 1 && timer.get() <= 5)
 //		{
 //			drive.swerveAbsolute(0, -.4, 0, 0, false);
