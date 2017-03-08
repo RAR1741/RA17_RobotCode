@@ -50,7 +50,7 @@ public class SwerveDrive implements Loggable
 		
 		if((x!=0 || y!=0) || z!=0)
 		{
-			movecount = 100;
+			movecount = 50;
 			if(fieldOrient)
 			{
 				temp = y * Math.cos(gyro) + x * Math.sin(gyro);

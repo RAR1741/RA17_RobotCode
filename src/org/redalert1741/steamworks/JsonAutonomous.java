@@ -174,6 +174,10 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		{
 			gear(ai);
 		}
+		else if(ai.type.equals("shoot"))
+		{
+			shoot(ai);
+		}
 		else if(ai.type.equals("brake"))
 		{
 			brake(ai);
@@ -256,6 +260,21 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		if(Math.abs(Robot.navx.getAngle()-navxStart-amt) < 0.5) { return true; }
 		Robot.drive.swerveAbsolute(0, 0, -turnSpeed, Robot.navx.getAngle(), false);
 		return false;
+	}
+	
+	public void shoot(AutoInstruction ai)
+	{
+		Robot.shooter.setSpeed(Config.getSetting("something", -1640));
+		if(timer.get() > ai.args.get(0))
+		{
+			Robot.carousel.forward();
+			if(timer.get() > ai.args.get(1))
+			{
+				Robot.shooter.stop();
+				Robot.carousel.stop();
+				reset();
+			}
+		}
 	}
 	
 	public void turnDegrees(AutoInstruction ai, boolean r)
