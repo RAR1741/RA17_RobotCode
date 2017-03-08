@@ -16,7 +16,7 @@ public class SteamworksFilter implements VisionFilter {
 			Rect bestRekt = rekt.get(0);
 			for(Rect r : rekt)
 			{
-				if(r.tl().y < bestRekt.tl().y)
+				if(r.area() > bestRekt.area())
 				{
 					bestRekt = r;
 				}
@@ -47,6 +47,30 @@ public class SteamworksFilter implements VisionFilter {
 			return bestRects;
 		}
 		return null;
+	}
+
+	@Override
+	public ArrayList<Rect> getBestRects(ArrayList<Rect> rect) 
+	{
+		ArrayList<Rect> rekt = rect;
+		if(!(rekt.isEmpty()) && rekt.size()>1)
+		{
+			ArrayList<Rect> bestRekt = new ArrayList<Rect>();
+			bestRekt.add(rekt.get(0));
+			bestRekt.add(rekt.get(1));
+			for(Rect r : rekt)
+			{
+				if(r.tl().y < bestRekt.tl().y)
+				{
+					bestRekt = r;
+				}
+			}
+			return bestRekt;
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 }
