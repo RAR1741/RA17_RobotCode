@@ -154,24 +154,7 @@ public class VisionThread
 	 */
 	public static Rect getBestRekt()
 	{
-//		ArrayList<Rect> rekt = getRekt();
-//		Rect bestRekt = rekt.get(0);
-//		if(!(rekt.isEmpty()))
-//		{
-//			for(Rect r : rekt)
-//			{
-//				if(r.tl().y < bestRekt.tl().y)
-//				{
-//					bestRekt = r;
-//				}
-//			}
-//			return bestRekt;
-//		}
-//		else
-//		{
-//			return null;
-//		}
-		return filter == null ? null : filter.getBestRect(getRekt());
+		return filter == null ? null : filter.getCombinedBestRect(getRekt());
 	}
 
 	/**

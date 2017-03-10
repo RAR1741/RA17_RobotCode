@@ -9,4 +9,5 @@ public interface VisionFilter
 	public abstract Rect getBestRect(ArrayList<Rect> rect);
 	public abstract ArrayList<Rect> getBestRects(ArrayList<Rect> rect);
 	public abstract ArrayList<Rect> getFilteredRects(ArrayList<Rect> rect);
+	public abstract Rect getCombinedBestRect(ArrayList<Rect> rekt);
 }
