@@ -32,6 +32,12 @@ public class Config
 	{
 		return parse(filename);
 	}
+	
+	public static boolean hasSetting(String name) {
+		String lower = name.toLowerCase();
+		
+		return doubleSettings.containsKey(lower) || stringSettings.containsKey(lower) || booleanSettings.containsKey(lower);
+	}
 
 	public static double getSetting(String name, double reasonable_default)
 	{
@@ -77,6 +83,18 @@ public class Config
 		name = name.toLowerCase();
 		doubleSettings.put(name, value);
 	}
+	
+	public static void setSetting(String name, boolean value)
+	{
+		name = name.toLowerCase();
+		booleanSettings.put(name, value);
+	}
+	
+	public static void setSetting(String name, String value)
+	{
+		name = name.toLowerCase();
+		stringSettings.put(name, value);
+	}
 
 	static boolean parse(String filename)
 	{
@@ -111,13 +129,14 @@ public class Config
 			{
 				String key = t.group(1);
 				Double value = Double.parseDouble(t.group(2));
-				doubleSettings.put(key.toLowerCase(), value);
+				setSetting(key, value);
 				System.out.println(key + ": " + value);
 			}
 			else if((t = booleanpattern.matcher(in)).matches())
 			{
 				String key = t.group(1);
 				Boolean value = Boolean.parseBoolean(t.group(2));
+				setSetting(key, value);
 				booleanSettings.put(key.toLowerCase(), value);
 				System.out.println(key + ": " + value);
 			}
@@ -125,7 +144,7 @@ public class Config
 			{
 				String key = t.group(1);
 				String value = t.group(2);
-				stringSettings.put(key.toLowerCase(), value);
+				setSetting(key, value);
 				System.out.println(key + ": " + value);
 			}
 			else if(!in.startsWith("#") && !in.isEmpty())
