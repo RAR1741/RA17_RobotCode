@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.redalert1741.robotBase.config.Config;
 import org.redalert1741.robotBase.config.Configurable;
+import org.redalert1741.steamworks.vision.VisionThread;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -32,6 +33,8 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	private double navxStart;
 	private PIDController turn;
 	private PIDController straighten;
+	private PIDController track;
+	private FakePIDSource cameraSource;
 	private double turnSpeed;
 	private boolean red;
 	private boolean edge;
@@ -80,6 +83,16 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		straighten.setOutputRange(-0.7, 0.7);
 		straighten.setAbsoluteTolerance(0);
 		straighten.setContinuous(true);
+		
+		cameraSource = new FakePIDSource(0,-180,180);
+		
+		track = new PIDController(Config.getSetting("AutoAimP", 0.01),
+				Config.getSetting("AutoAimI", 0),
+				Config.getSetting("AutoAimD", 0),cameraSource,this);
+		track.setInputRange(-180,180);
+		track.setOutputRange(-0.1,0.1);
+		track.setAbsoluteTolerance(0.5);
+		track.setContinuous(true);
 		
 		turn.setPID(Config.getSetting("auto_turn_p", 0.02), 
 				Config.getSetting("auto_turn_i", 0.00001),
@@ -170,6 +183,10 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 //		{
 //			driveRotation(ai);
 //		}
+		else if(ai.type.equals("drive-track"))
+		{
+			driveVTrack(ai);
+		}
 		else if(ai.type.equals("gear"))
 		{
 			gear(ai);
@@ -239,7 +256,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	{
 		if(Math.abs(Robot.drive.FRM.getDriveEnc()-start) < a)
 		{
-			Robot.drive.swerveAbsolute(x, y, 0, -Robot.navx.getAngle()+navxStart, fieldOrient);
+			Robot.drive.swerveAbsolute(x, y, z, -Robot.navx.getAngle()+navxStart, fieldOrient);
 		}
 		else
 		{
@@ -441,6 +458,31 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		}
 	}
 	
+	public void driveVTrack(AutoInstruction ai)
+	{
+		if(edge)
+		{
+			track.enable();
+			edge=false;
+		}
+		if(ai.args.size() == 3)
+		{
+			cameraSource.pidSet(-VisionThread.getHorizontalAngle());
+			track.setSetpoint(0);
+			ai.args.set(2, track.get());
+		}
+		else
+		{
+			cameraSource.pidSet(-VisionThread.getHorizontalAngle());
+			track.setSetpoint(0);
+			ai.args.add(track.get());
+		}
+		
+		System.out.println("Thing: " + ai.args.toString());
+		drive(ai,false,false);
+	}
+	
+	
 	/**
 	 * Processes a three-argument drive instruction 
 	 * @param ai
@@ -488,6 +530,9 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		straighten.setPID(Config.getSetting("auto_straight_p", 0.2), 
 				Config.getSetting("auto_straight_i", 0),
 				Config.getSetting("auto_straight_d", 0));
+		track.setPID(Config.getSetting("AutoAimP", 0.01),
+				Config.getSetting("AutoAimI", 0),
+				Config.getSetting("AutoAimD", 0));
 	}
 
 }

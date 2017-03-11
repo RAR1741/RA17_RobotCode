@@ -80,6 +80,10 @@ public class VisionThread
 	 */
 	private static void init()
 	{
+		if(lock == null)
+		{
+			lock = new Object();
+		}
 		if(pipeline == null)
 		{
 			pipeline = new GripPipeline();
@@ -167,12 +171,20 @@ public class VisionThread
 	{
 		Rect bestRect = getBestRekt();
 		Mat matthew = new Mat();
-		cvs.grabFrame(matthew);
-		double x = bestRect.br().x - (bestRect.width / 2);
-//		Set x to +/- 1 using the position on the screen
-		x = ((2 * (x / matthew.width())) - 1);
-		matthew.release();
-		return HORIZONTAL_CAMERA_ANGLE-(x*HORIZONTAL_FOV /2.0);
+		if(bestRect != null)
+		{
+			cvs.grabFrame(matthew);
+			double x = bestRect.br().x - (bestRect.width / 2);
+//			Set x to +/- 1 using the position on the screen
+			x = ((2 * (x / matthew.width())) - 1);
+			matthew.release();
+			return HORIZONTAL_CAMERA_ANGLE-(x*HORIZONTAL_FOV /2.0);
+		}
+		else
+		{
+			return Double.POSITIVE_INFINITY;
+		}
+
 	}
 	
 	public static double getWidthBestRekt()

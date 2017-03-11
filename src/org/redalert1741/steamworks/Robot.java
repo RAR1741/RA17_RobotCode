@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Calendar;
 
 import org.redalert1741.robotBase.logging.*;
+import org.redalert1741.steamworks.vision.*;
 import org.redalert1741.robotBase.config.*;
 import org.redalert1741.robotBase.input.*;
 
@@ -55,6 +56,7 @@ public class Robot extends IterativeRobot
 	private static PIDController driveAimer;
 	private static FakePIDSource cameraSource;
 	private static FakePIDOutput driveOutput;
+	private static VisionFilter sf;
 	
 	private double x;
 	private double y;
@@ -74,6 +76,7 @@ public class Robot extends IterativeRobot
 		pdp = new PowerDistributionPanel(20);
 		redLED = new Solenoid(0);
 		whiteLED = new Solenoid(1);
+		
 		scopeToggler = new ScopeToggler(0,1);
 		Config.loadFromFile("/home/lvuser/config.txt");
 		////////////////////////////////////////////////
@@ -130,6 +133,12 @@ public class Robot extends IterativeRobot
 		carousel = new Carousel(new CANTalon(9));
 		Config.addConfigurable(carousel);
 		
+		sf = new SteamworksFilter();
+		VisionThread.useAxisCamera();
+		VisionThread.enable();
+		VisionThread.setFilter(sf);
+
+		
 		ReloadConfig();
 	}
 //========================================================================================================
@@ -146,6 +155,8 @@ public class Robot extends IterativeRobot
 	@Override
 	public void autonomousPeriodic()
 	{
+		redLED.set(true);
+		whiteLED.set(true);
     	log(timer.get());
 //		if(timer.get() >= 1 && timer.get() <= 5)
 //		{
@@ -161,16 +172,17 @@ public class Robot extends IterativeRobot
 	@Override
     public void teleopInit()
     { setupPeriodic("teleop")
-	; drive.setCoast();
+	; drive.setCoast()
 	; //navx.reset();
-	; collect = false;
-	; System.gc();
+	; collect = false
+	; System.gc()
     ; }
 
 	@Override
 	public void teleopPeriodic()
 	{
-		
+		System.out.println("HA: " + VisionThread.getHorizontalAngle());
+		System.out.println("Target: " + VisionThread.getBestRekt());
 		if(driver.getYButton())
 		{
 			navx.reset();
