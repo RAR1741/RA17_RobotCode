@@ -1,0 +1,14 @@
+{
+        "auto":[
+                {"type":"drive-fo","unit":"Feet","amount":6.2,"args":[0,0.2]},
+                {"type":"brake","unit":"Invalid","amount":0.5,"args":[0.5]},
+                {"type":"turnDeg","unit":"Degrees","amount":48,"args":[0.1]},
+                {"type":"brake","unit":"Invalid","amount":0.25,"args":[0.25]},
+		{"type":"turnWheels","unit":"Invalid","amount":0.3,"args":[0,0.002]},
+                {"type":"drive-fo","unit":"Feet","amount":4,"args":[0,0.2]},
+                {"type":"gear","unit":"Invalid","amount":1,"args":[1]},
+                {"type":"intake","unit":"Invalid","amount":1,"args":[2]},
+                {"type":"drive-fo","unit":"Feet","amount":3,"args":[0,-0.2]}
+        ]
+}
+

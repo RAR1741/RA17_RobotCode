@@ -50,7 +50,7 @@ public class SwerveDrive implements Loggable
 		
 		if((x!=0 || y!=0) || z!=0)
 		{
-			movecount = 100;
+			movecount = 50;
 			if(fieldOrient)
 			{
 				temp = y * Math.cos(gyro) + x * Math.sin(gyro);
@@ -221,6 +221,15 @@ public class SwerveDrive implements Loggable
 		FLM.setAngle(0);
 		BRM.setAngle(0);
 		BLM.setAngle(0);
+	}
+	
+	public void tankDrive(double left, double right)
+	{
+		angleToZero();
+		FRM.setDriveSpeed(right);
+		BRM.setDriveSpeed(right);
+		FLM.setDriveSpeed(-left);
+		BLM.setDriveSpeed(-left);
 	}
 	
 	public void setEncMax(SwerveModule module,double max)

@@ -4,8 +4,6 @@ import org.redalert1741.robotBase.config.Config;
 import org.redalert1741.robotBase.config.Configurable;
 import org.redalert1741.robotBase.logging.DataLogger;
 import org.redalert1741.robotBase.logging.Loggable;
-import com.ctre.CANTalon;
-import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.Spark;
 
@@ -111,6 +109,7 @@ public class GearPlacer implements Loggable,Configurable
 	@Override
 	public void reloadConfig() 
 	{
-		Config.getSetting("gearMotorSpeed", 0.3);
+		motorSpeedOpen = Config.getSetting("gearMotorSpeedOpen", .4);
+		motorSpeedClose = Config.getSetting("gearMotorSpeedClose", 0.25);
 	}
 }

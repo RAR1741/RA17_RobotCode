@@ -10,6 +10,7 @@ import org.redalert1741.robotBase.input.*;
 import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.SPI.Port;
 
@@ -138,14 +139,14 @@ public class Robot extends IterativeRobot
 		drive.setBrake();
 		setupPeriodic("auto");
 		drive.angleToZero();
-		auton = new JsonAutonomous("/home/lvuser/auto-test.json");
+		auton = new JsonAutonomous("/home/lvuser/" + Config.getSetting("AutoFile", "none-auto") + ".json");
 		System.gc();
 	}
 
 	@Override
 	public void autonomousPeriodic()
 	{
-//    	log(timer.get());
+    	log(timer.get());
 //		if(timer.get() >= 1 && timer.get() <= 5)
 //		{
 //			drive.swerveAbsolute(0, -.4, 0, 0, false);
@@ -161,7 +162,7 @@ public class Robot extends IterativeRobot
     public void teleopInit()
     { setupPeriodic("teleop")
 	; drive.setCoast();
-	; navx.reset();
+	; //navx.reset();
 	; collect = false;
 	; System.gc();
     ; }
@@ -169,6 +170,11 @@ public class Robot extends IterativeRobot
 	@Override
 	public void teleopPeriodic()
 	{
+		
+		if(driver.getYButton())
+		{
+			navx.reset();
+		}
 		redLED.set(true);
 		whiteLED.set(true);
     	///////////////////////////////////////////////////////////////////////////
@@ -186,11 +192,34 @@ public class Robot extends IterativeRobot
     	twist = driver.getX(Hand.kRight);
     	
     	if(x >= -0.05 && x <= 0.05){x=0;}
-    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { x=0.5*x; }
+    	else if(!(driver.getBumper(Hand.kRight))) 
+    	{
+    		if(driver.getTriggerAxis(Hand.kLeft) >= 0.5)
+    		{
+    			x *= 0.3;
+    		}
+    		else
+    		{
+        		x *= 0.6; 
+    		}
+    	}
     	if(y >= -0.05 && y <= 0.05){y=0;}
-    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { y=0.5*y; }
+    	else if(!(driver.getBumper(Hand.kRight))) 
+    	{ 
+    		if(driver.getTriggerAxis(Hand.kLeft) >= 0.5)
+    		{
+    			y *= 0.3;
+    		}
+    		else
+    		{
+        		y *= 0.6; 
+    		} 
+    	}
     	if(twist >= -0.05 && twist <= 0.05){twist=0;}
-    	else if(!(driver.getTriggerAxis(Hand.kLeft) > 0.5)) { twist=0.5*twist; }
+    	else if(!(driver.getBumper(Hand.kRight))) 
+    	{ 
+    		twist=0.5*twist; 
+    	}
     	else { twist=0.8*twist; }
     	if(driveMode.Check(driver.getStartButton()))
     	{
@@ -212,15 +241,11 @@ public class Robot extends IterativeRobot
     	//Gear
     	if(driver.getBumper(Hand.kLeft) || op.getBumper(Hand.kLeft))
     	{
-    		gear.close();
-    	}
-    	else if(driver.getBumper(Hand.kRight) || op.getBumper(Hand.kRight))
-    	{
     		gear.open();
     	}
     	else
     	{
- //   		gear.stop();
+    		gear.close();
     	}
     	///////////////////////////////////////////////////////////////////////////
     	//Manipulation
@@ -231,7 +256,7 @@ public class Robot extends IterativeRobot
     	
     	if(collect)
     	{
-			manip.setInput(isCompetition() ? -1 : 1, isCompetition() ? 0.7 : -1);
+    		manip.setInput(isCompetition() ? -1 : 0.6, isCompetition() ? 0.7 : -0.7);
     	}
     	else
     	{
