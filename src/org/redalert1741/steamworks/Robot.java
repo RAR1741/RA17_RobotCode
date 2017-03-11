@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Calendar;
 
 import org.redalert1741.robotBase.logging.*;
+import org.redalert1741.steamworks.vision.*;
 import org.redalert1741.robotBase.config.*;
 import org.redalert1741.robotBase.input.*;
 
@@ -23,21 +24,21 @@ public class Robot extends IterativeRobot
 	private static Solenoid whiteLED;
 	@SuppressWarnings("unused")
 	private String auto = "";
-	
+
 	private double[][] maxEncValue = new double[4][2];
-	
+
 	public static SwerveDrive drive;
 	public static Climber climber;
 	public static GearPlacer gear;
 	public static Manipulation manip;
 	public static Shooter shooter;
 	public static Carousel carousel;
-	
+
 	private static XboxController driver;
 	private static XboxController op;
 	private static EdgeDetect driveMode;
 	private static EdgeDetect collection;
-	
+
 	private static CANTalon FR;
 	private static CANTalon FRa;
 	private static CANTalon FL;
@@ -50,11 +51,12 @@ public class Robot extends IterativeRobot
 	private static AnalogInput FLe;
 	private static AnalogInput BRe;
 	private static AnalogInput BLe;
-	
+
 	private static PIDController driveAimer;
 	private static FakePIDSource cameraSource;
 	private static FakePIDOutput driveOutput;
-	
+	private static VisionFilter sf;
+
 	private double x;
 	private double y;
 	private double twist;
@@ -64,7 +66,7 @@ public class Robot extends IterativeRobot
 //	private boolean configReload;
 	private JsonAutonomous auton;
 	private ScopeToggler scopeToggler;
-	
+
 	@Override
 	public void robotInit()
 	{
@@ -73,6 +75,7 @@ public class Robot extends IterativeRobot
 		pdp = new PowerDistributionPanel(20);
 		redLED = new Solenoid(0);
 		whiteLED = new Solenoid(1);
+
 		scopeToggler = new ScopeToggler(0,1);
 		Config.loadFromFile("/home/lvuser/config.txt");
 		////////////////////////////////////////////////
@@ -122,13 +125,19 @@ public class Robot extends IterativeRobot
 		Config.addConfigurable(gear);
 		////////////////////////////////////////////////
 		manip = new Manipulation(3,4,22);
-		
+
 		shooter = new Shooter(new CANTalon(10));
 		Config.addConfigurable(shooter);
-		
+
 		carousel = new Carousel(new CANTalon(9));
 		Config.addConfigurable(carousel);
-		
+
+		sf = new SteamworksFilter();
+		VisionThread.useAxisCamera();
+		VisionThread.enable();
+		VisionThread.setFilter(sf);
+
+
 		ReloadConfig();
 	}
 //========================================================================================================
@@ -145,6 +154,8 @@ public class Robot extends IterativeRobot
 	@Override
 	public void autonomousPeriodic()
 	{
+		redLED.set(true);
+		whiteLED.set(true);
     	log(timer.get());
 //		if(timer.get() >= 1 && timer.get() <= 5)
 //		{
@@ -168,7 +179,7 @@ public class Robot extends IterativeRobot
 
 	long avgMem = 0;
 	long avgC = 0;
-	
+
 	@Override
 	public void robotPeriodic()
 	{
@@ -178,12 +189,12 @@ public class Robot extends IterativeRobot
 		//System.out.println("Heap Space: " + (double)avgMem/avgC);
 		//memes.add(memes.get(memes.size()-1).replace("m", "meeeeemmesess").replace("e", "memees"));
 	}
->>>>>>> Stashed changes
 
 	@Override
 	public void teleopPeriodic()
 	{
-		
+		System.out.println("HA: " + VisionThread.getHorizontalAngle());
+		System.out.println("Target: " + VisionThread.getBestRekt());
 		if(driver.getYButton())
 		{
 			navx.reset();
@@ -203,9 +214,9 @@ public class Robot extends IterativeRobot
     	x = driver.getX(Hand.kLeft);
     	y = driver.getY(Hand.kLeft);
     	twist = driver.getX(Hand.kRight);
-    	
+
     	if(x >= -0.05 && x <= 0.05){x=0;}
-    	else if(!(driver.getBumper(Hand.kRight))) 
+    	else if(!(driver.getBumper(Hand.kRight)))
     	{
     		if(driver.getTriggerAxis(Hand.kLeft) >= 0.5)
     		{
@@ -213,25 +224,25 @@ public class Robot extends IterativeRobot
     		}
     		else
     		{
-        		x *= 0.6; 
+        		x *= 0.6;
     		}
     	}
     	if(y >= -0.05 && y <= 0.05){y=0;}
-    	else if(!(driver.getBumper(Hand.kRight))) 
-    	{ 
+    	else if(!(driver.getBumper(Hand.kRight)))
+    	{
     		if(driver.getTriggerAxis(Hand.kLeft) >= 0.5)
     		{
     			y *= 0.3;
     		}
     		else
     		{
-        		y *= 0.6; 
-    		} 
+        		y *= 0.6;
+    		}
     	}
     	if(twist >= -0.05 && twist <= 0.05){twist=0;}
-    	else if(!(driver.getBumper(Hand.kRight))) 
-    	{ 
-    		twist=0.5*twist; 
+    	else if(!(driver.getBumper(Hand.kRight)))
+    	{
+    		twist=0.5*twist;
     	}
     	else { twist=0.8*twist; }
     	if(driveMode.Check(driver.getStartButton()))
@@ -266,7 +277,7 @@ public class Robot extends IterativeRobot
     	{
     		collect = !collect;
     	}
-    	
+
     	if(collect)
     	{
     		manip.setInput(isCompetition() ? -1 : 0.6, isCompetition() ? 0.7 : -0.7);
@@ -275,7 +286,7 @@ public class Robot extends IterativeRobot
     	{
     		manip.setInput(0, 0);
     	}
-    	
+
     	if(driver.getPOV() == 0 || op.getPOV() == 0)
     	{
     		carousel.forward();
@@ -298,12 +309,12 @@ public class Robot extends IterativeRobot
     	{
     		shooter.stop();
     	}
-    	
+
     	if(driver.getYButton())
     	{
     		ReloadConfig();
     	}
-    	
+
     	scopeToggler.endLoop();
 	}
 //========================================================================================================
@@ -323,7 +334,7 @@ public class Robot extends IterativeRobot
     	{
     		ReloadConfig();
     	}
-    	
+
     	if(driver.getStartButton())
     	{
     		maxEncValue = drive.calibrateAngle();
@@ -333,7 +344,7 @@ public class Robot extends IterativeRobot
     		}
     	}
 	}
-	
+
 	@Override
 	public void disabledInit()
 	{
@@ -348,7 +359,7 @@ public class Robot extends IterativeRobot
 		startLogging(period,logger);
 		setupLogging();
 	}
-	
+
 	void startLogging(String mode, DataLogger l)
 	{
 		String robot = !(Config.getSetting("isPrototype", 0) == 0) ? "_proto" : "_comp";
@@ -381,7 +392,7 @@ public class Robot extends IterativeRobot
 		logger.setupLoggables();
 		logger.writeAttributes();
 	}
-	
+
 	void log(double time)
 	{
 		logger.log("Time", time);
@@ -390,7 +401,7 @@ public class Robot extends IterativeRobot
 		logger.log();
 		logger.writeLine();
 	}
-	
+
 	void ReloadConfig()
 	{
 		Config.loadFromFile("/home/lvuser/config.txt");
@@ -398,10 +409,9 @@ public class Robot extends IterativeRobot
 		//autoAimOffset = Config.getSetting("autoAimOffest", 0);
 		drive.ReloadConfig();
 	}
-	
+
 	public static boolean isCompetition()
 	{
 		return new File("/home/lvuser/comp.txt").exists();
 	}
 }
-
