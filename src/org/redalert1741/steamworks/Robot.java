@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Calendar;
 
 import org.redalert1741.robotBase.logging.*;
+import org.redalert1741.steamworks.autonomous.JsonAutonomous;
 import org.redalert1741.steamworks.vision.*;
 import org.redalert1741.robotBase.config.*;
 import org.redalert1741.robotBase.input.*;

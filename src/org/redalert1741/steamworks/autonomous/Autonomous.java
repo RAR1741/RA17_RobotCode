@@ -1,4 +1,4 @@
-package org.redalert1741.steamworks;
+package org.redalert1741.steamworks.autonomous;
 
 public abstract class Autonomous
 {

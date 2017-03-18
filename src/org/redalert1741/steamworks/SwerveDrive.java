@@ -20,10 +20,10 @@ public class SwerveDrive implements Loggable
 	private double max;
 	private int movecount;
 	
-	protected SwerveModule FRM;
-	protected SwerveModule FLM;
-	protected SwerveModule BRM;
-	protected SwerveModule BLM;
+	public SwerveModule FRM;
+	public SwerveModule FLM;
+	public SwerveModule BRM;
+	public SwerveModule BLM;
 	
 	public SwerveDrive(CANTalon fr, CANTalon fra, AnalogInput fre, CANTalon fl, CANTalon fla, AnalogInput fle, CANTalon br, CANTalon bra, AnalogInput bre, CANTalon bl, CANTalon bla, AnalogInput ble)
 	{

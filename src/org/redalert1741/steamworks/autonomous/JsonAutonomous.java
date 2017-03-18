@@ -1,4 +1,4 @@
-package org.redalert1741.steamworks;
+package org.redalert1741.steamworks.autonomous;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.redalert1741.robotBase.config.Config;
 import org.redalert1741.robotBase.config.Configurable;
+import org.redalert1741.steamworks.FakePIDSource;
+import org.redalert1741.steamworks.Robot;
 import org.redalert1741.steamworks.vision.VisionThread;
 
 import com.google.gson.JsonElement;

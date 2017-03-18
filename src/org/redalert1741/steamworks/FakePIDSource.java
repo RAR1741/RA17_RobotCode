@@ -13,14 +13,14 @@ public class FakePIDSource implements PIDSource
 	private double m_speed;
 	private Double m_lastPos;
 	
-	FakePIDSource(double offset,double min,double max)
+	public FakePIDSource(double offset,double min,double max)
 	{
 		m_offset = offset;
 		m_min = min;
 		m_max = max;
 	}
 	
-	FakePIDSource()
+	public FakePIDSource()
 	{
 		m_offset = 0.00f;
 		m_min = Double.MIN_VALUE;
