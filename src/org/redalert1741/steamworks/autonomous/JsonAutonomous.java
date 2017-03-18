@@ -50,23 +50,6 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	
 	protected DriverStation ap_ds;
 	
-	private enum Unit { Seconds, Milliseconds, EncoderTicks, Rotations, Inches, Feet, Degrees, Invalid };
-	
-	private static class AutoInstruction
-	{
-		public String type;
-		public Unit unit;
-		public double amount;
-		public List<Double> args;
-		public AutoInstruction(String type, Unit unit, double amount, List<Double> args)
-		{
-			this.type = type;
-			this.unit = unit;
-			this.amount = amount;
-			this.args = args;
-		}
-	}
-	
 	/**
 	 * Creates a JsonAutonomous from the specified file
 	 * @param file The location of the file to parse
