@@ -1,6 +1,7 @@
 package org.redalert1741.steamworks;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.redalert1741.robotBase.logging.*;
@@ -22,6 +23,8 @@ public class Robot extends IterativeRobot
 	private static PowerDistributionPanel pdp;
 	private static Solenoid redLED;
 	private static Solenoid whiteLED;
+	private static Solenoid gearIN;
+	private static Solenoid gearOUT;
 	@SuppressWarnings("unused")
 	private String auto = "";
 
@@ -75,6 +78,9 @@ public class Robot extends IterativeRobot
 		pdp = new PowerDistributionPanel(20);
 		redLED = new Solenoid(0);
 		whiteLED = new Solenoid(1);
+
+		gearIN = new Solenoid(6);
+		gearOUT = new Solenoid(7);
 
 		scopeToggler = new ScopeToggler(0,1);
 		Config.loadFromFile("/home/lvuser/config.txt");
@@ -137,7 +143,6 @@ public class Robot extends IterativeRobot
 		VisionThread.enable();
 		VisionThread.setFilter(sf);
 
-
 		ReloadConfig();
 	}
 //========================================================================================================
@@ -193,8 +198,10 @@ public class Robot extends IterativeRobot
 	@Override
 	public void teleopPeriodic()
 	{
+		//VisionThread.disable();
 		System.out.println("HA: " + VisionThread.getHorizontalAngle());
 		System.out.println("Target: " + VisionThread.getBestRekt());
+
 		if(driver.getYButton())
 		{
 			navx.reset();
@@ -266,9 +273,13 @@ public class Robot extends IterativeRobot
     	if(driver.getBumper(Hand.kLeft) || op.getBumper(Hand.kLeft))
     	{
     		gear.open();
+    		gearOUT.set(false);
+    		gearIN.set(true);
     	}
     	else
     	{
+    		gearOUT.set(true);
+    		gearIN.set(false);
     		gear.close();
     	}
     	///////////////////////////////////////////////////////////////////////////

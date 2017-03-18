@@ -174,7 +174,7 @@ public class VisionThread
 		if(bestRect != null)
 		{
 			cvs.grabFrame(matthew);
-			double x = bestRect.br().x - (bestRect.width / 2);
+			double x = bestRect.br().x - (bestRect.width / 2);//x = middle of target in x dir
 //			Set x to +/- 1 using the position on the screen
 			x = ((2 * (x / matthew.width())) - 1);
 			matthew.release();

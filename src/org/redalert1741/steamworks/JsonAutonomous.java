@@ -89,8 +89,8 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		track = new PIDController(Config.getSetting("AutoAimP", 0.01),
 				Config.getSetting("AutoAimI", 0),
 				Config.getSetting("AutoAimD", 0),cameraSource,this);
-		track.setInputRange(-180,180);
-		track.setOutputRange(-0.1,0.1);
+		track.setInputRange(-20,20);
+		track.setOutputRange(-0.2,0.2);
 		track.setAbsoluteTolerance(0.5);
 		track.setContinuous(true);
 		
@@ -460,6 +460,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	
 	public void driveVTrack(AutoInstruction ai)
 	{
+		VisionThread.filterRekts();
 		if(edge)
 		{
 			track.enable();
@@ -469,13 +470,14 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		{
 			cameraSource.pidSet(-VisionThread.getHorizontalAngle());
 			track.setSetpoint(0);
-			ai.args.set(2, track.get());
+			ai.args.set(0, track.get());
 		}
 		else
 		{
 			cameraSource.pidSet(-VisionThread.getHorizontalAngle());
 			track.setSetpoint(0);
-			ai.args.add(track.get());
+			ai.args.set(0,track.get());
+			ai.args.add(2,(double) 0);
 		}
 		
 		System.out.println("Thing: " + ai.args.toString());
