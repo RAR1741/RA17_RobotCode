@@ -7,4 +7,7 @@ public class WaitConsumer extends TimedConsumer
 	{
 		//Wow nothing happens during a wait
 	}
+
+	@Override
+	public void finish() {}
 }
