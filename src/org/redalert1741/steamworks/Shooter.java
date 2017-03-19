@@ -15,6 +15,10 @@ public class Shooter implements Loggable, Configurable
 	double wallRPM;
 	double boilerRPM;
 	double rpmThreshold;
+	double error;
+	double prevError;
+	double TBHVal;
+	double motorOut;
 	
 	public Shooter(CANTalon m)
 	{
@@ -31,8 +35,38 @@ public class Shooter implements Loggable, Configurable
     	flyWheel.configEncoderCodesPerRev(20);//40 for CIMcoder
     	flyWheel.enable();
     	
+    	error = 0;
+    	prevError = 10;
+    	TBHVal = Config.getSetting("TBH",0.0003);
+    	motorOut = 0;
+    	
     	boilerRPM = Config.getSetting("boilerRPM",2500);
     	rpmThreshold = Config.getSetting("ShooterRPMThreshold", 10);
+	}
+	
+	public void TBHShoot(double speed)
+	{
+		flyWheel.changeControlMode(TalonControlMode.PercentVbus);
+		double error = speed - flyWheel.getSpeed();
+		motorOut += TBHVal * error;
+		if(motorOut > 1)
+		{
+			motorOut = 1;
+		}
+		else if(motorOut < 0)
+		{
+			motorOut = 0;
+		}
+		
+		if(prevError>1 != error>1)
+		{
+			motorOut = 0.5 * (motorOut + TBHVal);
+			TBHVal = motorOut;
+			
+			prevError = error;
+		}
+		
+		flyWheel.set(motorOut);
 	}
 	
 	public void shoot()
