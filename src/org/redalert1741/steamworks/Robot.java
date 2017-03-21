@@ -24,8 +24,8 @@ public class Robot extends IterativeRobot
 	private static PowerDistributionPanel pdp;
 	private static Solenoid redLED;
 	private static Solenoid whiteLED;
-	private static Solenoid gearIN;
-	private static Solenoid gearOUT;
+	public static Solenoid gearIN;
+	public static Solenoid gearOUT;
 	@SuppressWarnings("unused")
 	private String auto = "";
 	
@@ -199,8 +199,8 @@ public class Robot extends IterativeRobot
 	public void teleopPeriodic()
 	{
 		//VisionThread.disable();
-		System.out.println("HA: " + VisionThread.getHorizontalAngle());
-		System.out.println("Target: " + VisionThread.getBestRekt());
+		//System.out.println("HA: " + VisionThread.getHorizontalAngle());
+		//System.out.println("Target: " + VisionThread.getBestRekt());
 		
 		if(driver.getYButton())
 		{

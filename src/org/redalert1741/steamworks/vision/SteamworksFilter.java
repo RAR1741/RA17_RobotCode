@@ -34,13 +34,15 @@ public class SteamworksFilter implements VisionFilter {
 	{
 		ArrayList<Rect> bestRects = new ArrayList<Rect>();
 		double aspect = Config.getSetting("TargetAspectRatio", .4);
-		double range = Config.getSetting("AspectRatioRange",0.1);
+		double range = Config.getSetting("AspectRatioRange",0.07);
 		if(!(rect.isEmpty()))
 		{
 			for(Rect r : rect)
 			{
-				if(Math.abs(aspect - (r.width/r.height)) < range)
+				
+				if(Math.abs(aspect - ((double)r.width/r.height)) < range)
 				{
+					System.out.println((double)r.width/r.height);
 					bestRects.add(r);
 				}
 			}
@@ -84,26 +86,27 @@ public class SteamworksFilter implements VisionFilter {
 	public Rect getCombinedBestRect(ArrayList<Rect> rect) 
 	{
 		ArrayList<Rect> rekt = rect;
-		if(!(rekt.isEmpty()) && rekt.size()>1)
+		if(!(rekt == null || rekt.isEmpty()) && rekt.size()>1)
 		{
-			ArrayList<Rect> bestRekts = new ArrayList<Rect>();
-			bestRekts.add(rekt.get(0));
-			bestRekts.add(rekt.get(1));
-			for(Rect r : rekt)
-			{
-				if(r.area() > bestRekts.get(1).area())
-				{
-					if(r.area() > bestRekts.get(0).area())
-					{
-						bestRekts.set(0, r);
-					}
-					else
-					{
-						bestRekts.set(1, r);
-					}
-				}
-			}
-			Rect bestRekt = new Rect(bestRekts.get(0).tl(),bestRekts.get(1).br());
+			rekt.sort((a,b) -> a.area() > b.area() ? -1 : 1);
+//			for(Rect r : rekt)
+//			{
+////				if(r.area() > bestRekts.get(1).area())
+////				{
+////					if(r.area() > bestRekts.get(0).area())
+////					{
+////						bestRekts.set(0, r);
+////					}
+////					else
+////					{
+////						bestRekts.set(1, r);
+////					}
+////				}
+//			}
+			System.out.println(rekt.get(0).area() + " " + rekt.get(1).area());
+//			System.out.println(bestRekts.get(0).tl() + " " + bestRekts.get(1).br());
+			Rect bestRekt = new Rect(rekt.get(0).tl(),rekt.get(1).br());
+//			System.out.println(bestRekt.tl() + " " + bestRekt.br());
 			return bestRekt;
 		}
 		else

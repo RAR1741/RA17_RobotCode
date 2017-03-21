@@ -158,7 +158,7 @@ public class VisionThread
 	 */
 	public static Rect getBestRekt()
 	{
-		return filter == null ? null : filter.getCombinedBestRect(getRekt());
+		return filter == null ? null : filter.getCombinedBestRect(filterRekts());
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class VisionThread
 	 * @see #getBestRekt()
 	 * @return angle to best Rect
 	 */
-	public static double getHorizontalAngle()
+	public static Double getHorizontalAngle()
 	{
 		Rect bestRect = getBestRekt();
 		Mat matthew = new Mat();

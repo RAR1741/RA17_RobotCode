@@ -321,6 +321,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 		start = Robot.drive.FRM.getDriveEnc();
 		navxStart = Robot.navx.getAngle();
 		edge = true;
+		VisionThread.disable();
 	}
 	
 	/**
@@ -359,11 +360,13 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	{
 		if(ai.args.get(0) == 1)
 		{
-			Robot.gear.open();
+			Robot.gearIN.set(true);
+			Robot.gearOUT.set(false);
 		}
 		else
 		{
-			Robot.gear.close();
+			Robot.gearIN.set(false);
+			Robot.gearOUT.set(true);
 		}
 		reset();
 	}
@@ -460,10 +463,10 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	
 	public void driveVTrack(AutoInstruction ai)
 	{
-		VisionThread.filterRekts();
 		if(edge)
 		{
 			track.enable();
+			VisionThread.enable();
 			edge=false;
 		}
 		if(ai.args.size() == 3)
@@ -478,9 +481,22 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 			track.setSetpoint(0);
 			ai.args.set(0,track.get());
 			ai.args.add(2,(double) 0);
+			System.out.println();
+			if(VisionThread.getHorizontalAngle().equals(Double.POSITIVE_INFINITY))
+			{
+				if(timer.get() > 0.5)
+				{
+					reset();
+				}
+			}
+			else
+			{
+				timer.reset();
+				timer.start();
+			}
 		}
 		
-		System.out.println("Thing: " + ai.args.toString());
+		//System.out.println("Thing: " + ai.args.toString());
 		drive(ai,false,false);
 	}
 	
@@ -492,7 +508,7 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 	public void drive(AutoInstruction ai, boolean fieldOrient, boolean r)
 	{
 		//System.out.println("Drive x: " + ai.args.get(0) + ", y: " + ai.args.get(1) + ", z: " + ai.args.get(2) + ", " + ai.amount + " " + ai.unit);
-		System.out.println(ai.args.get(2));
+//		System.out.println(ai.args.get(2));
 		Unit u = ai.unit;
 		if(u.equals(Unit.Seconds) || u.equals(Unit.Milliseconds))
 		{
