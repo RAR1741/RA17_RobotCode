@@ -60,6 +60,7 @@ public class Robot extends IterativeRobot
 	private static FakePIDSource cameraSource;
 	private static FakePIDOutput driveOutput;
 	private static VisionFilter sf;
+	private static PIDController track;
 	
 	private double x;
 	private double y;
@@ -67,6 +68,7 @@ public class Robot extends IterativeRobot
 //	private double autoAimOffset;
 	private boolean fieldOrient = true;
 	private boolean collect = true;
+	private boolean visionEdge = true;
 //	private boolean configReload;
 	private JsonAutonomous auton;
 	private ScopeToggler scopeToggler;
@@ -115,15 +117,15 @@ public class Robot extends IterativeRobot
 		driveMode = new EdgeDetect();
 		collection = new EdgeDetect();
 		////////////////////////////////////////////////
-		cameraSource = new FakePIDSource();
+		cameraSource = new FakePIDSource(0,-180,180);
 		driveOutput = new FakePIDOutput();
 		driveAimer = new PIDController(Config.getSetting("AutoAimP", 0.12),
 									   Config.getSetting("AutoAimI", 0.00),
 									   Config.getSetting("AutoAimD", 0.00),
 									   cameraSource,
 									   driveOutput);
-		driveAimer.setInputRange(-24,24);
-		driveAimer.setOutputRange(-.3,.3);
+		driveAimer.setInputRange(-20,20);
+		driveAimer.setOutputRange(-.2,.2);
 		driveAimer.setAbsoluteTolerance(.5);
 		////////////////////////////////////////////////
 		climber = new Climber(0, 1);
@@ -143,6 +145,7 @@ public class Robot extends IterativeRobot
 		VisionThread.useAxisCamera();
 		VisionThread.enable();
 		VisionThread.setFilter(sf);
+		
 		ReloadConfig();
 	}
 //========================================================================================================
@@ -218,45 +221,86 @@ public class Robot extends IterativeRobot
     	}
     	///////////////////////////////////////////////////////////////////////////
     	//Drive
-    	x = driver.getX(Hand.kLeft);
-    	y = driver.getY(Hand.kLeft);
-    	twist = driver.getX(Hand.kRight);
-    	
-    	if(x >= -0.05 && x <= 0.05){x=0;}
-    	else if(!(driver.getBumper(Hand.kRight))) 
+    	if(driver.getBButton())
     	{
-    		if(driver.getTriggerAxis(Hand.kLeft) >= 0.5)
+    		if(visionEdge)
     		{
-    			x *= 0.3;
+    			visionEdge = false;
+    			VisionThread.enable();
+    			cameraSource.pidSet(VisionThread.getHorizontalAngle());
+    			track.enable();
     		}
     		else
     		{
-        		x *= 0.6; 
+    			cameraSource.pidSet(VisionThread.getHorizontalAngle());
+    			track.setSetpoint(0);
+            	if(y >= -0.05 && y <= 0.05){y=0;}
+            	else if(!(driver.getBumper(Hand.kRight))) 
+            	{ 
+            		if(driver.getTriggerAxis(Hand.kLeft) >= 0.5)
+            		{
+            			y *= 0.3;
+            		}
+            		else
+            		{
+                		y *= 0.6; 
+            		} 
+            	}
+            	if(twist >= -0.05 && twist <= 0.05){twist=0;}
+            	else if(!(driver.getBumper(Hand.kRight))) 
+            	{ 
+            		twist=0.5*twist; 
+            	}
+            	else { twist=0.8*twist; }
+    			drive.swerve(driveOutput.pidGet(),y,0,0,false);
     		}
     	}
-    	if(y >= -0.05 && y <= 0.05){y=0;}
-    	else if(!(driver.getBumper(Hand.kRight))) 
-    	{ 
-    		if(driver.getTriggerAxis(Hand.kLeft) >= 0.5)
-    		{
-    			y *= 0.3;
-    		}
-    		else
-    		{
-        		y *= 0.6; 
-    		} 
-    	}
-    	if(twist >= -0.05 && twist <= 0.05){twist=0;}
-    	else if(!(driver.getBumper(Hand.kRight))) 
-    	{ 
-    		twist=0.5*twist; 
-    	}
-    	else { twist=0.8*twist; }
-    	if(driveMode.Check(driver.getStartButton()))
+    	else
     	{
-    		fieldOrient = !fieldOrient;
+    		VisionThread.disable();
+    		track.disable();
+    		visionEdge = true;
+        	x = driver.getX(Hand.kLeft);
+        	y = driver.getY(Hand.kLeft);
+        	twist = driver.getX(Hand.kRight);
+        	
+        	if(x >= -0.05 && x <= 0.05){x=0;}
+        	else if(!(driver.getBumper(Hand.kRight))) 
+        	{
+        		if(driver.getTriggerAxis(Hand.kLeft) >= 0.5)
+        		{
+        			x *= 0.3;
+        		}
+        		else
+        		{
+            		x *= 0.6; 
+        		}
+        	}
+        	if(y >= -0.05 && y <= 0.05){y=0;}
+        	else if(!(driver.getBumper(Hand.kRight))) 
+        	{ 
+        		if(driver.getTriggerAxis(Hand.kLeft) >= 0.5)
+        		{
+        			y *= 0.3;
+        		}
+        		else
+        		{
+            		y *= 0.6; 
+        		} 
+        	}
+        	if(twist >= -0.05 && twist <= 0.05){twist=0;}
+        	else if(!(driver.getBumper(Hand.kRight))) 
+        	{ 
+        		twist=0.5*twist; 
+        	}
+        	else { twist=0.8*twist; }
+        	if(driveMode.Check(driver.getStartButton()))
+        	{
+        		fieldOrient = !fieldOrient;
+        	}
+        	drive.swerve(-x,-y,-twist,-navx.getAngle(),fieldOrient);
     	}
-    	drive.swerve(-x,-y,-twist,-navx.getAngle(),fieldOrient);
+
     	///////////////////////////////////////////////////////////////////////////
     	//Climber
     	double trigger = Math.max(driver.getTriggerAxis(Hand.kRight), op.getTriggerAxis(Hand.kRight));
