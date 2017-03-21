@@ -15,10 +15,13 @@ public class SteamworksFilter implements VisionFilter
 		if(rekt.size()>1)
 		{
 			rekt.sort((a,b) -> a.area() > b.area() ? -1 : 1);
+			Rect bestRekt = new Rect(rekt.get(0).tl(),rekt.get(1).br());
+			return bestRekt;
 		}
-		Rect bestRekt = new Rect(rekt.get(0).tl(),rekt.get(1).br());
-//		System.out.println(bestRekt.tl() + " " + bestRekt.br());
-		return bestRekt;
+		else
+		{
+			return null;
+		}
 	}
 
 	public ArrayList<Rect> getFilteredRects(List<Rect> rect) 
@@ -36,8 +39,7 @@ public class SteamworksFilter implements VisionFilter
 					bestRects.add(r);
 				}
 			}
-			return bestRects;
 		}
-		return new ArrayList<Rect>();
+		return bestRects;
 	}
 }
