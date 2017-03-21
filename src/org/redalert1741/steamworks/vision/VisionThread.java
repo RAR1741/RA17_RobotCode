@@ -143,22 +143,12 @@ public class VisionThread
 	}
 	
 	/**
-	 * Filters all Rects using current {@link VisionFilter}
-	 * @see #getRekt()
-	 * @return Rects filtered by the current filter or all of the Rects if there is none
-	 */
-	public static ArrayList<Rect> filterRekts()
-	{
-		return filter == null ? getRekt() : filter.getFilteredRects(getRekt());
-	}
-	
-	/**
 	 * Finds the best Rect from {@link #getRekt()} using the current {@link VisionFilter}
 	 * @return The best Rect or null if no filter is set
 	 */
 	public static Rect getBestRekt()
 	{
-		return filter == null ? null : filter.getCombinedBestRect(filterRekts());
+		return filter == null ? null : filter.getBestRect(getRekt());
 	}
 
 	/**

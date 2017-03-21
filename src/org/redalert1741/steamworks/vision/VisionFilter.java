@@ -1,13 +1,10 @@
 package org.redalert1741.steamworks.vision;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.opencv.core.Rect;
 
 public interface VisionFilter
 {
-	public abstract Rect getBestRect(ArrayList<Rect> rect);
-	public abstract ArrayList<Rect> getBestRects(ArrayList<Rect> rect);
-	public abstract ArrayList<Rect> getFilteredRects(ArrayList<Rect> rect);
-	public abstract Rect getCombinedBestRect(ArrayList<Rect> rekt);
+	public abstract Rect getBestRect(List<Rect> rect);
 }
