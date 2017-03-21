@@ -12,7 +12,7 @@ public class SteamworksFilter implements VisionFilter
 	public Rect getBestRect(List<Rect> rect) 
 	{
 		ArrayList<Rect> rekt = getFilteredRects(rect);
-		if(!(rekt.isEmpty()) && rekt.size()>1)
+		if(rekt.size()>1)
 		{
 			rekt.sort((a,b) -> a.area() > b.area() ? -1 : 1);
 		}
