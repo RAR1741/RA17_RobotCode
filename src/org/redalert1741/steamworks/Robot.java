@@ -10,7 +10,6 @@ import org.redalert1741.robotBase.input.*;
 import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.SPI.Port;
 
@@ -159,13 +158,27 @@ public class Robot extends IterativeRobot
 	}
 //========================================================================================================
 	@Override
-    public void teleopInit()
-    { setupPeriodic("teleop")
-	; drive.setCoast();
+	public void teleopInit()
+	{ setupPeriodic("teleop")
+	; drive.setCoast()
 	; //navx.reset();
-	; collect = false;
-	; System.gc();
-    ; }
+	; collect = false
+	; System.gc()
+	; }
+
+	long avgMem = 0;
+	long avgC = 0;
+	
+	@Override
+	public void robotPeriodic()
+	{
+		super.robotPeriodic();
+		avgMem += Runtime.getRuntime().freeMemory();
+		avgC++;
+		//System.out.println("Heap Space: " + (double)avgMem/avgC);
+		//memes.add(memes.get(memes.size()-1).replace("m", "meeeeemmesess").replace("e", "memees"));
+	}
+>>>>>>> Stashed changes
 
 	@Override
 	public void teleopPeriodic()
