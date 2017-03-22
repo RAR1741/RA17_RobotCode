@@ -481,21 +481,21 @@ public class JsonAutonomous extends Autonomous implements PIDOutput, Configurabl
 			track.setSetpoint(0);
 			ai.args.set(0,track.get());
 			ai.args.add(2,(double) 0);
-			System.out.println();
-			if(VisionThread.getHorizontalAngle().equals(Double.POSITIVE_INFINITY))
+		}
+
+		if(VisionThread.getHorizontalAngle().equals(Double.POSITIVE_INFINITY))
+		{
+			System.out.println("none");
+			if(timer.get() > Config.getSetting("TargetLostThreshold", 1.5))
 			{
-				if(timer.get() > 0.5)
-				{
-					reset();
-				}
-			}
-			else
-			{
-				timer.reset();
-				timer.start();
+				reset();
 			}
 		}
-		
+		else
+		{
+			timer.reset();
+			timer.start();
+		}
 		//System.out.println("Thing: " + ai.args.toString());
 		drive(ai,false,false);
 	}
