@@ -35,7 +35,7 @@ public class SteamworksFilter implements VisionFilter
 			{
 				if(Math.abs(aspect - ((double)r.width/r.height)) < range)
 				{
-					System.out.println((double)r.width/r.height);
+					//System.out.println((double)r.width/r.height);
 					bestRects.add(r);
 				}
 			}
