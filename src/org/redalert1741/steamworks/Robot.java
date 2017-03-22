@@ -60,7 +60,6 @@ public class Robot extends IterativeRobot
 	private static FakePIDSource cameraSource;
 	private static FakePIDOutput driveOutput;
 	private static VisionFilter sf;
-	private static PIDController track;
 	
 	private double x;
 	private double y;
@@ -228,12 +227,13 @@ public class Robot extends IterativeRobot
     			visionEdge = false;
     			VisionThread.enable();
     			cameraSource.pidSet(VisionThread.getHorizontalAngle());
-    			track.enable();
+    			driveAimer.enable();
     		}
     		else
     		{
+            	y = driver.getY(Hand.kLeft);
     			cameraSource.pidSet(VisionThread.getHorizontalAngle());
-    			track.setSetpoint(0);
+    			driveAimer.setSetpoint(0);
             	if(y >= -0.05 && y <= 0.05){y=0;}
             	else if(!(driver.getBumper(Hand.kRight))) 
             	{ 
@@ -252,13 +252,13 @@ public class Robot extends IterativeRobot
             		twist=0.5*twist; 
             	}
             	else { twist=0.8*twist; }
-    			drive.swerve(driveOutput.pidGet(),y,0,0,false);
+    			drive.swerve(-driveOutput.pidGet(),-y,0,0,false);
     		}
     	}
     	else
     	{
     		VisionThread.disable();
-    		track.disable();
+    		driveAimer.disable();
     		visionEdge = true;
         	x = driver.getX(Hand.kLeft);
         	y = driver.getY(Hand.kLeft);
