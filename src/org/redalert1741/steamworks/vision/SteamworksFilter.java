@@ -34,7 +34,7 @@ public class SteamworksFilter implements VisionFilter {
 	{
 		ArrayList<Rect> bestRects = new ArrayList<Rect>();
 		double aspect = Config.getSetting("TargetAspectRatio", .4);
-		double range = Config.getSetting("AspectRatioRange",0.05);
+		double range = Config.getSetting("AspectRatioRange",0.1);
 		if(!(rect.isEmpty()))
 		{
 			for(Rect r : rect)
@@ -103,7 +103,7 @@ public class SteamworksFilter implements VisionFilter {
 					}
 				}
 			}
-			Rect bestRekt = new Rect(bestRekts.get(0).tl(),bestRekts.get(0).br());
+			Rect bestRekt = new Rect(bestRekts.get(0).tl(),bestRekts.get(1).br());
 			return bestRekt;
 		}
 		else
