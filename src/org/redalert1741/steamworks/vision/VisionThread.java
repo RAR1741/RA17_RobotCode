@@ -20,7 +20,7 @@ public class VisionThread
 	private static VisionRunnable vision;
 	private static GripPipeline pipeline;
 	private static CvSink cvs;
-	private static VideoSource source;
+	public static VideoSource source;
 	private static Object lock;
 	private static VisionFilter filter;
 	
@@ -64,7 +64,7 @@ public class VisionThread
 	 */
 	public static void disable()
 	{
-		if(vision != null)
+		if(vision != null && thread != null)
 		{
 			vision.stop();
 			while(thread.isAlive()) {Thread.yield();}
@@ -113,7 +113,17 @@ public class VisionThread
 	{
 		source = s;
 		init();
-		cvs.setSource(source);
+		try
+		{
+			cvs.setSource(source);
+		}
+		catch(Exception e)
+		{
+//			Catch any errors and print them to the console
+			System.out.println("Camera Connection Failed...");
+			e.printStackTrace();
+		}
+
 	}
 	
 	/**
@@ -192,6 +202,16 @@ public class VisionThread
 	 */
 	public static void useAxisCamera()
 	{
-		setSource(new AxisCamera("camera1", Config.getSetting("visionCamera", "axis1741.local")));
+		try
+		{
+			setSource(new AxisCamera("camera1", Config.getSetting("visionCamera", "axis-1741-bw.local")));
+			System.out.println("Opened successfully...");
+		}
+		catch (Exception e) 
+		{
+//			Catch any errors and print them to the console
+			System.out.println("Camera Connection Failed...");
+			e.printStackTrace();
+		}
 	}
 }

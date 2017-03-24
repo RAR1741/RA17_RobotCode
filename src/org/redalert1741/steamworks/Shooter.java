@@ -87,5 +87,10 @@ public class Shooter implements Loggable, Configurable
 		flyWheel.setF(f);
 		flyWheel.setPID(p, i, d);
 	}
+	
+	public boolean isClose()
+	{
+		return Math.abs(flyWheel.getEncVelocity() - flyWheel.getSetpoint()) < 100;
+	}
 
 }

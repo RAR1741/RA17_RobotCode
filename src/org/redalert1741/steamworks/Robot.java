@@ -1,6 +1,10 @@
 package org.redalert1741.steamworks;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -14,6 +18,7 @@ import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.SPI.Port;
 
 public class Robot extends IterativeRobot
@@ -64,14 +69,47 @@ public class Robot extends IterativeRobot
 	private double x;
 	private double y;
 	private double twist;
+	private static boolean cameraExists;
 //	private double autoAimOffset;
 	private boolean fieldOrient = true;
 	private boolean collect = true;
 	private boolean visionEdge = true;
+	private double prevTime = 0.0001;
+	private double time = 0;
 //	private boolean configReload;
 	private JsonAutonomous auton;
 	private ScopeToggler scopeToggler;
 	ArrayList<String> memes;
+	
+	public static void findCamera()
+	{
+		new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				while(true)
+				{
+					try(Socket s = new Socket())
+					{
+						s.connect(new InetSocketAddress(Config.getSetting("visionCamera", "axis-1741-bw.local"), 443), 5000);
+						cameraExists = true;
+						if(VisionThread.source == null)
+						{
+							VisionThread.useAxisCamera();
+						}
+					}
+					catch(IOException e)
+					{
+						//e.printStackTrace();
+						cameraExists = false;
+					}
+					//System.out.println(cameraExists);
+					Thread.yield();
+				}
+			}
+		}).start();
+	}
 	
 	@Override
 	public void robotInit()
@@ -141,9 +179,19 @@ public class Robot extends IterativeRobot
 		Config.addConfigurable(carousel);
 		
 		sf = new SteamworksFilter();
-		VisionThread.useAxisCamera();
-		VisionThread.enable();
+		
+		findCamera();
+
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		VisionThread.setFilter(sf);
+		if(cameraExists)
+		{
+			VisionThread.enable();	
+		}
 		
 		ReloadConfig();
 	}
@@ -200,9 +248,9 @@ public class Robot extends IterativeRobot
 	@Override
 	public void teleopPeriodic()
 	{
-		//VisionThread.disable();
-		//System.out.println("HA: " + VisionThread.getHorizontalAngle());
-		//System.out.println("Target: " + VisionThread.getBestRekt());
+		time = timer.get();
+//		System.out.println("HA: " + VisionThread.getHorizontalAngle());
+//		System.out.println("Target: " + VisionThread.getBestRekt());
 		
 		if(driver.getYButton())
 		{
@@ -213,54 +261,99 @@ public class Robot extends IterativeRobot
     	///////////////////////////////////////////////////////////////////////////
     	//Utility
 		scopeToggler.startLoop(); // Must be first line in periodic
-    	log(timer.get());
+    	
     	if(driver.getBackButton())
     	{
     		ReloadConfig();
     	}
     	///////////////////////////////////////////////////////////////////////////
     	//Drive
-    	if(driver.getBButton())
+    	if(cameraExists)
     	{
-    		if(visionEdge)
-    		{
-    			visionEdge = false;
-    			VisionThread.enable();
-    			cameraSource.pidSet(VisionThread.getHorizontalAngle());
-    			driveAimer.enable();
-    		}
-    		else
-    		{
-            	y = driver.getY(Hand.kLeft);
-    			cameraSource.pidSet(VisionThread.getHorizontalAngle());
-    			driveAimer.setSetpoint(0);
-            	if(y >= -0.05 && y <= 0.05){y=0;}
-            	else if(!(driver.getBumper(Hand.kRight))) 
-            	{ 
-            		if(driver.getTriggerAxis(Hand.kLeft) >= 0.5)
-            		{
-            			y *= 0.3;
-            		}
-            		else
-            		{
-                		y *= 0.6; 
-            		} 
-            	}
-            	if(twist >= -0.05 && twist <= 0.05){twist=0;}
-            	else if(!(driver.getBumper(Hand.kRight))) 
-            	{ 
-            		twist=0.5*twist; 
-            	}
-            	else { twist=0.8*twist; }
-    			drive.swerve(-driveOutput.pidGet(),-y,0,0,false);
-    		}
+	    	if(driver.getBButton())
+	    	{
+	    		if(visionEdge)
+	    		{
+	    			visionEdge = false;
+	    			VisionThread.enable();
+	    			cameraSource.pidSet(VisionThread.getHorizontalAngle());
+	    			driveAimer.enable();
+	    		}
+	    		else
+	    		{
+	            	y = driver.getY(Hand.kLeft);
+	    			cameraSource.pidSet(VisionThread.getHorizontalAngle());
+	    			driveAimer.setSetpoint(0);
+	            	if(y >= -0.05 && y <= 0.05){y=0;}
+	            	else if(!(driver.getBumper(Hand.kRight))) 
+	            	{ 
+	            		if(driver.getTriggerAxis(Hand.kLeft) >= 0.5)
+	            		{
+	            			y *= 0.3;
+	            		}
+	            		else
+	            		{
+	                		y *= 0.6; 
+	            		} 
+	            	}
+	            	if(twist >= -0.05 && twist <= 0.05){twist=0;}
+	            	else if(!(driver.getBumper(Hand.kRight))) 
+	            	{ 
+	            		twist=0.5*twist; 
+	            	}
+	            	else { twist=0.8*twist; }
+	    			drive.swerve(-driveOutput.pidGet(),-y,0,0,false);
+	    		}
+	    	}
+	    	else
+	    	{
+	    		VisionThread.disable();
+	    		driveAimer.disable();
+	    		visionEdge = true;
+	        	x = driver.getX(Hand.kLeft);
+	        	y = driver.getY(Hand.kLeft);
+	        	twist = driver.getX(Hand.kRight);
+	        	
+	        	if(x >= -0.05 && x <= 0.05){x=0;}
+	        	else if(!(driver.getBumper(Hand.kRight))) 
+	        	{
+	        		if(driver.getTriggerAxis(Hand.kLeft) >= 0.5)
+	        		{
+	        			x *= 0.3;
+	        		}
+	        		else
+	        		{
+	            		x *= 0.6; 
+	        		}
+	        	}
+	        	if(y >= -0.05 && y <= 0.05){y=0;}
+	        	else if(!(driver.getBumper(Hand.kRight))) 
+	        	{ 
+	        		if(driver.getTriggerAxis(Hand.kLeft) >= 0.5)
+	        		{
+	        			y *= 0.3;
+	        		}
+	        		else
+	        		{
+	            		y *= 0.6; 
+	        		} 
+	        	}
+	        	if(twist >= -0.05 && twist <= 0.05){twist=0;}
+	        	else if(!(driver.getBumper(Hand.kRight))) 
+	        	{ 
+	        		twist=0.5*twist; 
+	        	}
+	        	else { twist=0.8*twist; }
+	        	if(driveMode.Check(driver.getStartButton()))
+	        	{
+	        		fieldOrient = !fieldOrient;
+	        	}
+	        	drive.swerve(-x,-y,-twist,-navx.getAngle(),fieldOrient);
+	    	}
     	}
     	else
     	{
-    		VisionThread.disable();
-    		driveAimer.disable();
-    		visionEdge = true;
-        	x = driver.getX(Hand.kLeft);
+    		x = driver.getX(Hand.kLeft);
         	y = driver.getY(Hand.kLeft);
         	twist = driver.getX(Hand.kRight);
         	
@@ -316,7 +409,6 @@ public class Robot extends IterativeRobot
     	//Gear
     	if(driver.getBumper(Hand.kLeft) || op.getBumper(Hand.kLeft))
     	{
-    		gear.open();
     		gearOUT.set(false);
     		gearIN.set(true);
     	}
@@ -324,7 +416,6 @@ public class Robot extends IterativeRobot
     	{
     		gearOUT.set(true);
     		gearIN.set(false);
-    		gear.close();
     	}
     	///////////////////////////////////////////////////////////////////////////
     	//Manipulation
@@ -369,8 +460,10 @@ public class Robot extends IterativeRobot
     	{
     		ReloadConfig();
     	}
-    	
+    	log(timer.get());
+    	prevTime = time;
     	scopeToggler.endLoop();
+
 	}
 //========================================================================================================
 	@Override
@@ -439,6 +532,9 @@ public class Robot extends IterativeRobot
 		logger.addAttribute("Time");
 		logger.addAttribute("ClimberA1");
 		logger.addAttribute("ClimberA2");
+		logger.addAttribute("CameraExists");
+		logger.addAttribute("HeapSpace");
+		logger.addAttribute("LoopTime");
 		logger.addLoggable(drive);
 		logger.addLoggable(navx);
 		logger.addLoggable(gear);
@@ -451,8 +547,11 @@ public class Robot extends IterativeRobot
 	void log(double time)
 	{
 		logger.log("Time", time);
-		logger.log("ClimberA1", pdp.getCurrent(15));
-		logger.log("ClimberA2", pdp.getCurrent(14));
+		logger.log("ClimberA1", pdp.getCurrent(13));
+		logger.log("ClimberA2", pdp.getCurrent(12));
+		logger.log("CameraExists", cameraExists);
+		logger.log("HeapSpace",(double)avgMem/avgC);
+		logger.log("LogTime",time-prevTime);
 		logger.log();
 		logger.writeLine();
 	}

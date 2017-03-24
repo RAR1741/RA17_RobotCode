@@ -16,8 +16,8 @@ public class Carousel implements Configurable, Loggable
 	public Carousel(CANTalon s)
 	{
 		motor = s;
-		//TODO should encoder
 		motor.changeControlMode(TalonControlMode.PercentVbus);
+		forwardSpeed = Config.getSetting("carouselSpeed", 0.7);
 	}
 	
 	public void forward()
