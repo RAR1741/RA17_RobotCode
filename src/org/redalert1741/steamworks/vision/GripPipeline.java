@@ -1,3 +1,5 @@
+package org.redalert1741.steamworks.vision;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
