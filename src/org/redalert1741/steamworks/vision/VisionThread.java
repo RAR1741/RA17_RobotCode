@@ -10,7 +10,10 @@ import org.redalert1741.robotBase.config.Config;
 
 import edu.wpi.cscore.AxisCamera;
 import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.CvSource;
+import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource;
+import edu.wpi.first.wpilibj.CameraServer;
 
 public class VisionThread
 {
@@ -23,6 +26,7 @@ public class VisionThread
 	public static VideoSource source;
 	private static Object lock;
 	private static VisionFilter filter;
+	private static CvSource outputStream;
 	
 	public static class VisionRunnable implements Runnable
 	{
@@ -39,6 +43,11 @@ public class VisionThread
 				synchronized (lock)
 				{
 					pipeline.process(matthew);
+				}
+				if(outputStream != null)
+				{
+					System.out.println("put");
+					outputStream.putFrame(pipeline.rgbThresholdOutput());
 				}
 				matthew.release();
 				Thread.yield();
@@ -213,5 +222,13 @@ public class VisionThread
 			System.out.println("Camera Connection Failed...");
 			e.printStackTrace();
 		}
+	}
+	
+	public static void useUSBCamera()
+	{
+		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+        camera.setResolution(640, 480);
+		setSource(camera);
+		outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
 	}
 }

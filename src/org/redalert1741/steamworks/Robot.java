@@ -81,35 +81,35 @@ public class Robot extends IterativeRobot
 	private ScopeToggler scopeToggler;
 	ArrayList<String> memes;
 	
-	public static void findCamera()
-	{
-		new Thread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				while(true)
-				{
-					try(Socket s = new Socket())
-					{
-						s.connect(new InetSocketAddress(Config.getSetting("visionCamera", "axis-1741-bw.local"), 443), 5000);
-						cameraExists = true;
-						if(VisionThread.source == null)
-						{
-							VisionThread.useAxisCamera();
-						}
-					}
-					catch(IOException e)
-					{
-						//e.printStackTrace();
-						cameraExists = false;
-					}
-					//System.out.println(cameraExists);
-					Thread.yield();
-				}
-			}
-		}).start();
-	}
+//	public static void findCamera()
+//	{
+//		new Thread(new Runnable()
+//		{
+//			@Override
+//			public void run()
+//			{
+//				while(true)
+//				{
+//					try(Socket s = new Socket())
+//					{
+//						s.connect(new InetSocketAddress(Config.getSetting("visionCamera", "axis-1741-bw.local"), 443), 5000);
+//						cameraExists = true;
+//						if(VisionThread.source == null)
+//						{
+//							VisionThread.useAxisCamera();
+//						}
+//					}
+//					catch(IOException e)
+//					{
+//						//e.printStackTrace();
+//						cameraExists = false;
+//					}
+//					//System.out.println(cameraExists);
+//					Thread.yield();
+//				}
+//			}
+//		}).start();
+//	}
 	
 	@Override
 	public void robotInit()
@@ -179,19 +179,10 @@ public class Robot extends IterativeRobot
 		Config.addConfigurable(carousel);
 		
 		sf = new SteamworksFilter();
-		
-		findCamera();
 
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		VisionThread.useUSBCamera();
+		VisionThread.enable();
 		VisionThread.setFilter(sf);
-		if(cameraExists)
-		{
-			VisionThread.enable();	
-		}
 		
 		ReloadConfig();
 	}
@@ -249,8 +240,10 @@ public class Robot extends IterativeRobot
 	public void teleopPeriodic()
 	{
 		time = timer.get();
+		//VisionThread.disable();
 //		System.out.println("HA: " + VisionThread.getHorizontalAngle());
 //		System.out.println("Target: " + VisionThread.getBestRekt());
+		System.out.println(VisionThread.getRekt());
 		
 		if(driver.getYButton())
 		{
@@ -353,7 +346,9 @@ public class Robot extends IterativeRobot
     	}
     	else
     	{
-    		x = driver.getX(Hand.kLeft);
+    		driveAimer.disable();
+    		visionEdge = true;
+        	x = driver.getX(Hand.kLeft);
         	y = driver.getY(Hand.kLeft);
         	twist = driver.getX(Hand.kRight);
         	
