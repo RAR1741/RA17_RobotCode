@@ -143,7 +143,7 @@ public class VisionThread
 	{
 		synchronized (lock)
 		{
-			return pipeline.findContoursOutput();
+			return pipeline.filterContoursOutput();
 		}
 	}
 	
