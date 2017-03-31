@@ -11,7 +11,10 @@ public class SteamworksFilter implements VisionFilter
 	@Override
 	public Rect getBestRect(List<Rect> rect) 
 	{
+		System.out.println("============");
+		System.out.println(rect);
 		ArrayList<Rect> rekt = getFilteredRects(rect);
+		System.out.println(rekt);
 		if(rekt.size()>1)
 		{
 			rekt.sort((a,b) -> a.area() > b.area() ? -1 : 1);
@@ -28,7 +31,7 @@ public class SteamworksFilter implements VisionFilter
 	{
 		ArrayList<Rect> bestRects = new ArrayList<Rect>();
 		double aspect = Config.getSetting("TargetAspectRatio", .4);
-		double range = Config.getSetting("AspectRatioRange",0.07);
+		double range = Config.getSetting("AspectRatioRange",0.4);
 		if(!(rect.isEmpty()))
 		{
 			for(Rect r : rect)

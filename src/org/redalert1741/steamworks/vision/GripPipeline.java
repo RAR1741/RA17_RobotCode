@@ -48,9 +48,9 @@ public class GripPipeline {
 
 		// Step RGB_Threshold0:
 		Mat rgbThresholdInput = resizeImageOutput;
-		double[] rgbThresholdRed = {0.0, 250.64846416382252};
-		double[] rgbThresholdGreen = {245.82733812949638, 255.0};
-		double[] rgbThresholdBlue = {238.48920863309354, 252.82423208191125};
+		double[] rgbThresholdRed = {0.0, 255.0};
+		double[] rgbThresholdGreen = {181, 255.0};
+		double[] rgbThresholdBlue = {151, 255.0};
 		rgbThreshold(rgbThresholdInput, rgbThresholdRed, rgbThresholdGreen, rgbThresholdBlue, rgbThresholdOutput);
 
 		// Step Find_Contours0:
@@ -60,11 +60,11 @@ public class GripPipeline {
 
 		// Step Filter_Contours0:
 		ArrayList<MatOfPoint> filterContoursContours = findContoursOutput;
-		double filterContoursMinArea = 4.0;
+		double filterContoursMinArea = 2.0;
 		double filterContoursMinPerimeter = 1.0;
-		double filterContoursMinWidth = 3.0;
+		double filterContoursMinWidth = 2.0;
 		double filterContoursMaxWidth = 1000;
-		double filterContoursMinHeight = 8.0;
+		double filterContoursMinHeight = 2.0;
 		double filterContoursMaxHeight = 1000;
 		double[] filterContoursSolidity = {0.0, 100.0};
 		double filterContoursMaxVertices = 1000000;

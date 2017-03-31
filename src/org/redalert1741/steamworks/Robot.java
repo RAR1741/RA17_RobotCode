@@ -243,7 +243,7 @@ public class Robot extends IterativeRobot
 		//VisionThread.disable();
 //		System.out.println("HA: " + VisionThread.getHorizontalAngle());
 //		System.out.println("Target: " + VisionThread.getBestRekt());
-		System.out.println(VisionThread.getRekt());
+		//System.out.println(VisionThread.getRekt());
 		
 		if(driver.getYButton())
 		{
@@ -293,13 +293,15 @@ public class Robot extends IterativeRobot
             		twist=0.5*twist; 
             	}
             	else { twist=0.8*twist; }
+            	System.out.println("Drive Output: " + driveOutput.pidGet());
+            	System.out.println("Horizontal Angle: " + VisionThread.getHorizontalAngle());
     			drive.swerve(-driveOutput.pidGet(),-y,0,0,false);
     		}
     	}
     	else
     	{
     		VisionThread.disable();
-    		driveAimer.disable();
+    		driveAimer.reset();
     		visionEdge = true;
         	x = driver.getX(Hand.kLeft);
         	y = driver.getY(Hand.kLeft);

@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.CameraServer;
 public class VisionThread
 {
 	private static final int HORIZONTAL_CAMERA_ANGLE = (int) Config.getSetting("HorizontalCameraAngle", 0);
-	private static final double HORIZONTAL_FOV = (int) Config.getSetting("HorizontalFOV", 49);
+	private static final double HORIZONTAL_FOV = (int) Config.getSetting("HorizontalFOV", 60);
 	private static Thread thread;
 	private static VisionRunnable vision;
 	private static GripPipeline pipeline;
@@ -46,7 +46,7 @@ public class VisionThread
 				}
 				if(outputStream != null)
 				{
-					System.out.println("put");
+					//System.out.println("put");
 					outputStream.putFrame(pipeline.rgbThresholdOutput());
 				}
 				matthew.release();
@@ -182,10 +182,11 @@ public class VisionThread
 		Mat matthew = new Mat();
 		if(bestRect != null)
 		{
-			cvs.grabFrame(matthew);
+			int w = (int) Config.getSetting("camerawidth", 160);
 			double x = bestRect.br().x - (bestRect.width / 2);//x = middle of target in x dir
 //			Set x to +/- 1 using the position on the screen
-			x = ((2 * (x / matthew.width())) - 1);
+			x = ((2 * (x / w)) - 1);
+			System.out.println("Matthew width: " + w);
 			matthew.release();
 			return HORIZONTAL_CAMERA_ANGLE-(x*HORIZONTAL_FOV /2.0);
 		}
@@ -229,6 +230,6 @@ public class VisionThread
 		UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
         camera.setResolution(640, 480);
 		setSource(camera);
-		outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
+//		outputStream = CameraServer.getInstance().putVideo("Blur", 640, 480);
 	}
 }
