@@ -12,8 +12,8 @@ public class Climber implements Loggable
 
 	public Climber(int c1, int c2)
 	{
-		climber1 = new Spark(c1);
-		climber2 = new Spark(c2);
+		climber2 = new Spark(c1);
+		climber1 = new Spark(c2);
 	}
 	
 	public void climb(double speed)
